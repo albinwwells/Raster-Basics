@@ -25,4 +25,4 @@ All of the functions can be imported with:
  - `end_points`: obtain raster values at point locations
 
 ## Tutorial
-Follow the Jupyter Notebook rasterio_basics to see how functions can be used. The notebook rasterio_basics-package is identical to rasterio_basics but uses the installed Python Raster_Basics module. Access to the sample data used in the tutorial can be found [here](https://drive.google.com/file/d/1lNiQBo-rNe2_VC6vUCM2gfp-Z-F2Q49c/view?usp=share_link). Run the notebook code in the same folder as the data.
+Follow the Jupyter Notebook `rasterio_basics.ipynb` to see how functions can be used. The notebook `rasterio_basics-package.ipynb` is identical to `rasterio_basics.ipynb` but uses the installed Python Raster_Basics module. Access to the [sample data used in the tutorial can be found here](https://drive.google.com/file/d/1lNiQBo-rNe2_VC6vUCM2gfp-Z-F2Q49c/view?usp=share_link). Run the notebook code in the same folder as the data.
