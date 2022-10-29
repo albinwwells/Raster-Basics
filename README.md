@@ -9,7 +9,9 @@ To import the modules, type `import raster_basics` or import specific functions 
 All of the functions can be imported with:
 
 `from raster_basics.RasterBasics import show_fig, rasterLike
+
 from raster_basics.RasterBasics import shpReprojection, shpClip, tifReprojectionResample,fillHole, mosaic_files
+
 from raster_basics.RasterBasics import extract_along_line,points_along_lines, end_points`
 
 ## Functions
