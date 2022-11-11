@@ -26,3 +26,38 @@ All of the functions can be imported with:
 
 ## Tutorial
 Follow the Jupyter Notebook `rasterio_basics.ipynb` to see how functions can be used. The notebook `rasterio_basics-package.ipynb` is identical to `rasterio_basics.ipynb` but uses the installed Python Raster_Basics module. Access to the [sample data used in the tutorial can be found here](https://drive.google.com/file/d/1lNiQBo-rNe2_VC6vUCM2gfp-Z-F2Q49c/view?usp=share_link). Run the notebook code in the same folder as the data.
+
+
+## Other functions in the package
+There are a few more functions to help produce specific plots and glacier calculations. These can be imported with:
+
+ - `from raster_basics.DataPlots import FUNCTION_NAME`
+ - `from raster_basics.GlacierFunctions import FUNCTION_NAME`
+ 
+ where `FUNCTION_NAME` is the name of the desired function.
+ 
+ ## Example Glacier Functions
+  - `glacierArea`: get the area of a glacier
+  - `totalMassBalance`: get the total mass change on a glacier (pixel by pixel)
+  - `totalMassBalanceValue`: get the total mass change on a glacier (area-sum of pixels)
+  - `divQ`: get the flux divergence
+  - `glacierAttributes`: obtain the slope (in degrees, percentage, or riserun) or the aspect from a DEM geotiff
+  - `glacierSlope`: alternate function to obtain the riserun slope from an array
+  - `demHillshade`: create a hillshade from a DEM
+  - `velocityAspect`: returns the aspect of velocity based on vx and vy
+  - `velAspectAngle`: get the angle between two arrays of velocity aspect
+ 
+ ## Example Plotting Functions
+ Note that all of these plots use the title to save a .png image in a 'Figures/' subfolder within the current working directory.
+  - `plotData`: another method to plot an array. Can handle quiver inputs for arrows on velocity plots
+  - `plotData3`: same as `plotData` but places 3 plots side-by-side
+  - `plotMany`: an arbitrary number of plots side-by-side in a grid
+  - `elevationBinPlot`: plots two sets of data: line plot for MB and horizontal bar graph for elevation bin size
+  - `elevationBinPlot3Subfigs`: plots `elevationBinPlot` along with 3 more subplots from desired input arrays
+  - `plotDataPoints`: plots labeled data points on top of an array basemap. This is used to plot stake locations, for example
+  - `velPlot`: this does no actually plot anything. Rather, it returns the quiver input needed to plot velocity arrows in other functions such as `plotData`
+  - `plotClassify`: plot array with discrete values
+  - `plotContinuous`: plot array with continuous values
+
+
+
