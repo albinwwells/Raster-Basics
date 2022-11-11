@@ -34,11 +34,12 @@ Follow the Jupyter Notebook `rasterio_basics.ipynb` to see how functions can be 
 There are a few more functions to help produce specific plots and glacier calculations. These can be imported with:
 
  - `from raster_basics.GlacierFunctions import FUNCTION_NAME`
+ - `from raster_basics.BaseFunctions import FUNCTION_NAME`
  - `from raster_basics.DataPlots import FUNCTION_NAME`
  
  where `FUNCTION_NAME` is the name of the desired function.
  
- ## Example Glacier Functions
+## Example Glacier Functions
   - `glacierArea`: get the area of a glacier
   - `totalMassBalance`: get the total mass change on a glacier (pixel by pixel)
   - `totalMassBalanceValue`: get the total mass change on a glacier (area-sum of pixels)
@@ -49,7 +50,13 @@ There are a few more functions to help produce specific plots and glacier calcul
   - `velocityAspect`: returns the aspect of velocity based on vx and vy
   - `velAspectAngle`: get the angle between two arrays of velocity aspect
  
- ## Example Plotting Functions
+## Example Base Functions
+  - `glacierOutline`: uses a shapefile and raster array of ones to create a binary array of glacier terrain (1 is glacier, 0 is off-glacier)
+  - `altitudeAggregation`: returns statistics for a desired statistic in an elevation bin, bin boundaries, count, number, standar deviation, min, and max
+  - `binPercentile`: returns binned statistics value at a desired percentile of a bin (e.g. 25th percentile MB value per elevation bin)
+  - `latlonTiffIndex`: obtain raster array index values from a lat/lon coordinate pair
+
+## Example Plotting Functions
  Note that all of these plots use the title to save a .png image in a 'Figures/' subfolder within the current working directory.
   - `plotData`: another method to plot an array. Can handle quiver inputs for arrows on velocity plots
   - `plotData3`: same as `plotData` but places 3 plots side-by-side
