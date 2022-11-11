@@ -31,8 +31,8 @@ Follow the Jupyter Notebook `rasterio_basics.ipynb` to see how functions can be 
 # Other functions in the package
 There are a few more functions to help produce specific plots and glacier calculations. These can be imported with:
 
- - `from raster_basics.DataPlots import FUNCTION_NAME`
  - `from raster_basics.GlacierFunctions import FUNCTION_NAME`
+ - `from raster_basics.DataPlots import FUNCTION_NAME`
  
  where `FUNCTION_NAME` is the name of the desired function.
  
