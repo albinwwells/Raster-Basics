@@ -6,6 +6,8 @@ Activate the desired python or conda environment, then enter `pip install raster
 
 To import the modules, type `import raster_basics` or import specific functions with `from raster_basics.RasterBasics import function`
 
+If you've already downloaded the module, enter `sudo pip install raster_basics --upgrade` while in the conda environment to upgrade to the newest version
+
 All of the functions can be imported with:
 
  - `from raster_basics.RasterBasics import show_fig, rasterLike`
