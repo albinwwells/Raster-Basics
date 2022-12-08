@@ -1,7 +1,7 @@
 # Raster-Basics
 Basic geoprocessing tools to handle geotiff and shapefile data
 
-Some additional tools for basic glacier plotting and calculations 
+Contains some additional tools for basic glacier plotting and calculations 
 
 ## Installation
 Activate the desired python or conda environment, then enter `pip install raster_basics`
