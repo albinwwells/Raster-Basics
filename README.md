@@ -60,7 +60,7 @@ There are a few more functions to help produce specific plots and glacier calcul
 
 ## Example Plotting Functions
  Note that all of these plotting functions only save the image if `savefig=True` (by default, it is set to `False`).
-  - `plotData`: another method to plot an array. Can handle quiver inputs for arrows on velocity plots
+  - `plotData`: another method to plot an array. Can handle quiver inputs for arrows on velocity plots (quiver input from `velPlot` function)
   - `plotData3`: same as `plotData` but places 3 plots side-by-side
   - `plotMany`: an arbitrary number of plots side-by-side in a grid
   - `elevationBinPlot`: plots two sets of data: line plot for MB and horizontal bar graph for elevation bin size
