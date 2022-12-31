@@ -59,7 +59,7 @@ There are a few more functions to help produce specific plots and glacier calcul
   - `latlonTiffIndex`: obtain raster array index values from a lat/lon coordinate pair
 
 ## Example Plotting Functions
- Note that all of these plots use the title to save a .png image in a 'Figures/' subfolder within the current working directory.
+ Note that all of these plotting functions only save the image if `savefig=True` (by default, it is set to `False`).
   - `plotData`: another method to plot an array. Can handle quiver inputs for arrows on velocity plots
   - `plotData3`: same as `plotData` but places 3 plots side-by-side
   - `plotMany`: an arbitrary number of plots side-by-side in a grid
