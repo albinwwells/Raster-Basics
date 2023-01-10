@@ -38,7 +38,7 @@ def totalMassBalanceValue(totalMB, area, res):
 	res: pixel resolution (int or float)
     """
     # totalMB[totalMB == 0] = np.nan
-    totalMassBalanceVal = np.sum(totalMB * res * res) / area  # total mass balance in kg/m2-yr
+    totalMassBalanceVal = np.nansum(totalMB * res * res) / area  # total mass balance in kg/m2-yr
     return totalMassBalanceVal
 
 def divQ(vx, vy, h, res, vCol=0.8):
