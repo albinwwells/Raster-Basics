@@ -15,7 +15,7 @@ def glacierOutline(ones_raster, shape, dest):
 	shape: glacier outline shapefline filepath (str) (e.g. 'outline.shp')
 	dest: output filename (str) (e.g. 'output.tif')
     """
-    shpClip(ones_raster, shape, dest, nan_val=0, fill=True, pad_size=0)
+    shpClip(ones_raster, shape, dest, nan_val=0, fill=True, pad_size=0, crop=False)
     return rasterio.open(dest).read(1)
 
 # def glacierOutline(outlineFile):
