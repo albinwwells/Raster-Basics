@@ -71,7 +71,7 @@ def shpReprojection(shapefile, crs, dst='reprojected_shape.shp'):
     src.to_file(dst)
     
 
-def shpClip(geotiff, shapefile, destination, nan_val=0, fill=True, pad_size=0):
+def shpClip(geotiff, shapefile, destination, nan_val=0, fill=True, pad_size=0, crop=True):
     """
     Clip a geotiff with a shapefile
 	geotiff: input raster to clip (str) (e.g. 'input.tif')
@@ -91,7 +91,7 @@ def shpClip(geotiff, shapefile, destination, nan_val=0, fill=True, pad_size=0):
         out_image, out_transform = rasterio.mask.mask(
             src, 
             shapes, 
-            crop=True, 
+            crop=crop, 
             filled=fill, 
             nodata=nan_val, 
             pad=True, 
