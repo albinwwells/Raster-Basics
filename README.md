@@ -31,6 +31,8 @@ All of the functions can be imported with:
 ## Tutorial
 Follow the Jupyter Notebook `rasterio_basics.ipynb` to see how functions can be used. The notebook `rasterio_basics-package.ipynb` is identical to `rasterio_basics.ipynb` but uses the installed Python Raster_Basics module. Access to the [sample data used in the tutorial can be found here](https://drive.google.com/file/d/1lNiQBo-rNe2_VC6vUCM2gfp-Z-F2Q49c/view?usp=share_link). Run the notebook code in the same folder as the data.
 
+`wolverine_index_site_method.ipynb` is a notebook that shows an example comparing glaciologic and geodetic mass balance calculations using the `raster-basics` module. This includes an uncertainty estimate of the geodetic mass balance following a Monte Carlo approach.
+
 
 # Other functions in the package
 There are a few more functions to help produce specific plots and glacier calculations. These can be imported with:
