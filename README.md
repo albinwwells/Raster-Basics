@@ -43,6 +43,7 @@ There are a few more functions to help produce specific plots and glacier calcul
  - `from raster_basics.GlacierFunctions import FUNCTION_NAME`
  - `from raster_basics.BaseFunctions import FUNCTION_NAME`
  - `from raster_basics.DataPlots import FUNCTION_NAME`
+ - `from raster_basics.SmoothingFunctions import FUNCTION_NAME`
  
  where `FUNCTION_NAME` is the name of the desired function.
  
@@ -74,6 +75,10 @@ There are a few more functions to help produce specific plots and glacier calcul
   - `velPlot`: this does no actually plot anything. Rather, it returns the quiver input needed to plot velocity arrows in other functions such as `plotData`
   - `plotClassify`: plot array with discrete values
   - `plotContinuous`: plot array with continuous values
-
+  
+## Example Smoothing Functions
+  - `sgolay2d`: Savitzky-Golay smoothing filter to eliminate high frequency noise via moving average; a low-pass filter
+  - `gaussianFilter`: Gaussian (normal) smoothing filter
+  - `dynamicSmoothing`: Gaussian filter, dynamic smoothing with changing pixel window size
 
 
