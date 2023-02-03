@@ -17,7 +17,7 @@ All of the functions can be imported with:
  - `from raster_basics.RasterBasics import extract_along_line,points_along_lines, end_points`
  
 ### Installing Dependencies
-Dependencies to run `raster_basics` can be installed via the `requirements.txt` file. Download the file, navigate to it's directory in the terminal, and install dependencies by typing `pip install -r requirements.txt` or `conda install --file requirements.txt`. This should install all the dependencies needed to run the `raster_basics` module.
+Dependencies to run `raster_basics` can be installed via the `requirements.txt` file. Download the file, navigate to it's directory in the terminal, and install dependencies by typing `pip install -r requirements.txt` or `conda install --file requirements.txt`. If creating a new conda environment for `raster_basics`, you may also need to `conda install pip` initially. This should install all the dependencies needed to run the `raster_basics` module.
 
 ## Functions
  - `show_fig`: show geotiff as a matplotlib figure
