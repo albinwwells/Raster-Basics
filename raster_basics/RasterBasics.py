@@ -121,6 +121,11 @@ def tifReprojectionResample(file, reprojected_tif, crs, res, interp, extent_file
 	interp: resampling interpolation method (Resampling method from rasterio.warp module)  (e.g. rasterio.warp.Resampling.cubic_spline)
 	extent_file: raster file to match extent (str)    
     """
+
+    if extent_file != None:
+        tifReprojectionResample(file, 'temp_output.tif', crs, res, interp, extent_file=None)
+        file = 'temp_output.tif'
+    
     with rasterio.open(file) as src:
         if extent_file is None:
             # keep initial file bounds
@@ -162,6 +167,9 @@ def tifReprojectionResample(file, reprojected_tif, crs, res, interp, extent_file
                 dst_crs=crs,
                 resampling=interp   # Resampling.cubic_spline
             )
+            
+        if extent_file != None:
+            os.remove('temp_output.tif')
 
 
 def fillHole(file, dest='output_filled.tif', dist=10, iters=1):
