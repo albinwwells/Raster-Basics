@@ -103,6 +103,29 @@ def demHillshade(demArray, az=135, alt=30):
     hillshade = es.hillshade(demArray, azimuth=az, altitude=alt)     # Create and plot the hillshade with earthpy
     return hillshade
 
+def demAspect(dem_array, res):
+    """
+    Aspect of a DEM array – takes an array input instead of raster
+	dem_array: input array (array-like)
+	res: pixel resolution (int or float)
+    """
+    aspect_array = np.zeros_like(dem_array)
+    py, px = np.gradient(dem_array, res)
+    print(px)
+    print(py)
+
+    for i in range(len(aspect_array)):
+        for j in range(len(aspect_array[0])):
+            pixel_deg = math.atan2(py[i][j], px[i][j]) * 180 / math.pi
+            if pixel_deg >= 0 and pixel_deg <= 90:
+                pixel_aspect = 90 - pixel_deg
+            elif pixel_deg < 0:
+                pixel_aspect = abs(pixel_deg) + 90
+            elif pixel_deg > 90:
+                pixel_aspect = 450 - pixel_deg
+            aspect_array[i][j] = pixel_aspect
+    return aspect_array
+
 
 def velocityAspect(vel_x, vel_y):
     # gets the aspect of velocity vectors, given input x- and y-direction velocity arrays
