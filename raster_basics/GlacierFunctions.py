@@ -53,6 +53,21 @@ def divQ(vx, vy, h, res, vCol=0.8):
                   (np.gradient(vy * -1, res)[0] * h) + (np.gradient(h * -1, res)[0] * vy)) * vCol
     return divQarray
 
+def flux_div_comps(vx, vy, h, res, vCol=0.8):
+    """
+    Flux divergence - return each component as well
+	vx, vy: x- and y-direction velocity, m/yr (array-like)
+	h: glacier thickness, m (array-like)
+	res: pixel resolution (int or float)
+	vCol: vertical-average velocity scaling factor, typically 0.8 (int or float)
+    """
+    dvx = (np.gradient(vx, res)[1] * h) * vCol
+    dvy = (np.gradient(vy * -1, res)[0] * h) * vCol 
+    dhx = (np.gradient(h, res)[1] * vx) * vCol
+    dhy = (np.gradient(h * -1, res)[0] * vy) * vCol
+    divQ = dvx + dvy + dhx + dhy
+    return divQ, dvx, dvy, dhx, dhy
+
 
 def glacierAttributes(dem_rast, attrFormat):
     # return desired attribute (attrFormat is 'slope_degree' or 'slope_percentage', 'slope_riserun', 'aspect')
