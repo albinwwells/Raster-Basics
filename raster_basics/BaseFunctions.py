@@ -25,20 +25,20 @@ def glacierOutline(ones_raster, shape, dest):
 #     currentGlacierOutline[currentGlacierOutline != 0] = 1  # make mask binary (0 and 1)
 #     return currentGlacierOutline.to_numpy()
 
-def altitudeAggregation(calcFile, dem, outline, stat, bin_z=None):
+def altitudeAggregation(calcFile, dem, outline, stat, bin_z=50):
     '''
     Returns elevation-binned mass balance means
     :param calcFile: file on which to compute the statistic (array-like)
     :param dem: DEM for elevation binning (array-like)
     :param outline: glacier outline (array-like)
     :param stat: statistic to be calculated ('mean', 'count', 'sum')
-    :param bin_z: interval for binning, which is a DEM height interval
+    :param bin_z: interval for binning, which is a DEM height interval or list of elevation boundaries
     :return: array of the altitudinally-binned statistic and elevation bin boundaries
     '''
     demGlacier = np.multiply(dem, outline)
     demGlacierArray = demGlacier[~np.isnan(demGlacier)]
     demGlacier_findMin = demGlacier[demGlacier != 0]
-    if bin_z == None or str(bin_z).isnumeric() == True:
+    if str(bin_z).isnumeric() == True:
         z_bin_range = range(int(demGlacier_findMin.min()), int(demGlacier_findMin.max() + bin_z), bin_z)
     else:
         z_bin_range = bin_z
