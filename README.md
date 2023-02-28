@@ -75,6 +75,7 @@ There are a few more functions to help produce specific plots and glacier calcul
   - `velPlot`: this does no actually plot anything. Rather, it returns the quiver input needed to plot velocity arrows in other functions such as `plotData`
   - `plotClassify`: plot array with discrete values
   - `plotContinuous`: plot array with continuous values
+  - `plot_binned_data`: returns a data array with values corresponding to alitudinally-aggregated elevation bins
   
 ## Example Smoothing Functions
   - `sgolay2d`: Savitzky-Golay smoothing filter to eliminate high frequency noise via moving average; a low-pass filter
