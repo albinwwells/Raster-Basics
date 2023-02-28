@@ -278,5 +278,34 @@ def end_points(xarr, points):
         point_spot.append(point)
     return point_spot
 
+def distance_to_shp(geotiff, gpd_shapefile, common_crs='EPSG:32606'):
+    '''
+    Gets the distance from every pixel to a shapefile
+    :param geotiff: input raster file (geotiff as string)
+    :param gpd_shapefile: shapefile object to calculate distance from, e.g. centerlines (gpd read shapefile)
+    :param common_crs: common crs for geotiff and shapefile data, e.g. EPSG:32606 (coordinate as string)
+    :return: array of values with distance from shapefile
+    '''
+    with rasterio.open(geotiff) as dataset:
+        val = dataset.read(1)
+        data = [(dataset.xy(x,y)[0],dataset.xy(x,y)[1],val[x,y]) if (np.isnan(val[x,y]) == False) 
+                else (np.nan,np.nan,np.nan) for x,y in np.ndindex(val.shape)]
+        lon = [i[0] for i in data]
+        lat = [i[1] for i in data]
+        d = [i[2] for i in data]
+        res = pd.DataFrame({"lon":lon,'lat':lat,"data":d})
+        res_geodf = gpd.GeoDataFrame(res, geometry=gpd.points_from_xy(res['lon'], res['lat'], crs=dataset.crs))
+
+    # Convert both line and points to the same projected CRS.
+    gpd_shapefile_com = gpd_shapefile.to_crs(common_crs)
+    res_geodf_com = res_geodf.to_crs(common_crs)
+
+    # The track line shapefile may contain several lines. To measure the shortest distance do a union of all tracks
+    single_gpd_shapefile = gpd_shapefile_com.unary_union
+    res_geodf_com['distance_m'] = res_geodf_com.distance(single_gpd_shapefile) # Measure the distance
+    distances = res_geodf_com['distance_m'].to_numpy()
+    distances_array = np.reshape(distances, val.shape)
+    return distances_array
+
 
 
