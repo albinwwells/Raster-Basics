@@ -161,6 +161,5 @@ def smoothingCorrection(orig_data, smooth_data, centerlines):
     smooth_vals_mean = np.mean(smooth_vals)
     scaling = orig_vals_mean/smooth_vals_mean # scaling factor between smooth and raw data based on centerline mean
     smooth_data_scaled = rasterio.open(smooth_data).read(1)*scaling
-    print(scaling)
-    return smooth_data_scaled
+    return smooth_data_scaled, scaling
 
