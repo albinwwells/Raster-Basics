@@ -186,7 +186,7 @@ def distance_scaling_correction(data_vals1, data_vals2, distance, polyfit_order=
         y[y > mean + (3*std)] = np.nan
         
     # Find binned average values
-    stat, edges, __ = binned_statistic(x, y, statistic=np.nanmean, bins=30, range=(int(x.min()), int(x.max() + 1)))
+    stat, edges, __ = binned_statistic(x, y, statistic=np.nanmean, bins=30, range=(int(np.nanmin(x)), int(np.nanmax(x) + 1)))
     bin_centers = edges[1:] - (abs(edges[0] - edges[1])) / 2
     
     # Fit polynomial to values and use polynomial to derive values at each point
