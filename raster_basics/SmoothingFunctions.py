@@ -1,6 +1,10 @@
 import numpy as np
 import scipy.signal
 import scipy.ndimage
+import itertools
+import rasterio
+from .RasterBasics import points_along_lines
+
 
 def sgolay2d(z, window_size, order, derivative=None):
     '''
@@ -138,4 +142,25 @@ def dynamicSmoothing(z, window_weight, pixel_size, f):
             else:
                 smooth_file[r, c] = 0           # we don't want to smooth 0 regions so we leave these as 0
     return smooth_file
+    
+def smoothingCorrection(orig_data, smooth_data, centerlines):
+    '''
+    Apply a correction to smoothed data products, such that smoothing does not decrease the mean values
+    Correction is based on glacier centerline values
+    :param orig_data: originial data, e.g. unsmoothed velocity or ice thickness (raster)
+    :param smooth_data: smoothed data, e.g. output after applying Gaussian filter (raster)
+    :param centerlines: centerline(s) for the data, e.g. from OGGM (shapefile)
+    :return: smooth array that has been corrected (array-like)
+    '''
+    orig_out = points_along_lines(orig_data, centerlines) # get values along all centerlines
+    smooth_out = points_along_lines(smooth_data, centerlines)
+    orig_vals = np.array(list(itertools.chain.from_iterable(orig_out[0]))) # combine centerline values to one array
+    smooth_vals = np.array(list(itertools.chain.from_iterable(smooth_out[0])))
+    
+    orig_vals_mean = np.mean(orig_vals) # find the mean of all centerline values
+    smooth_vals_mean = np.mean(smooth_vals)
+    scaling = orig_vals_mean/smooth_vals_mean # scaling factor between smooth and raw data based on centerline mean
+    smooth_data_scaled = rasterio.open(smooth_data).read(1)*scaling
+    print(scaling)
+    return smooth_data_scaled
 
