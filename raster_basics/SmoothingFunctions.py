@@ -150,7 +150,7 @@ def smoothingCorrection(orig_data, smooth_data, centerlines):
     :param orig_data: originial data, e.g. unsmoothed velocity or ice thickness (raster)
     :param smooth_data: smoothed data, e.g. output after applying Gaussian filter (raster)
     :param centerlines: centerline(s) for the data, e.g. from OGGM (shapefile)
-    :return: smooth array that has been corrected (array-like)
+    :return: smooth array that has been corrected (array-like) and scaling factor (float)
     '''
     orig_out = points_along_lines(orig_data, centerlines) # get values along all centerlines
     smooth_out = points_along_lines(smooth_data, centerlines)
