@@ -814,4 +814,29 @@ def plotContinuous(array, range, cbar, title, cbarTitle, quiver=None, savefig=Fa
     else:
     	plt.show()
 
+def plot_binned_data(binStat, binNumber, outline, remove_top_check=True):
+    '''
+    Return data array with values corresponding to alitudinally-aggregated elevation bins
+    :param binStat: values of statistic to return in the elevation bin (list)
+    :param binNumber: bin number of each value in the array (array-like)
+    :param outline: glacier outline (binary; array-like)
+    :param remove_top_check: whether to check if the top-most elevation bin is very small, and (if so) removes it. Fixes a potential bug in the altitudinal aggregation (boolean)
+    :return: array of altitudinally-aggregated data
+    '''
+    if remove_top_check==True:
+        # If we get a pixel in it's own elevation bin, without a recorded elevation bin. This is a problem
+        final_bin_count = np.unique(binNumber, return_counts=True)[1][-1]
+
+        if final_bin_count <= 5 and len(binStat) != int(binNumber.max()):
+            print('Top bin pixel count was: ', final_bin_count, '\n\tIt has been merged with the second-to-top bin.')
+            binNumber[binNumber == binNumber.max()] = binNumber.max() - 1
+
+    binnedStat = np.zeros(binNumber.shape)
+
+    for i in range(len(binNumber)):
+        binnedStat[i] = binStat[binNumber[i] - 1]
+
+    outlineShape = outline.shape
+    binnedStat = np.array(binnedStat).reshape(outlineShape) * outline
+    return binnedStat
 
