@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.signal
 import scipy.ndimage
+from scipy.stats import binned_statistic
 import itertools
 import rasterio
 from .RasterBasics import points_along_lines
@@ -162,4 +163,39 @@ def smoothingCorrection(orig_data, smooth_data, centerlines):
     scaling = orig_vals_mean/smooth_vals_mean # scaling factor between smooth and raw data based on centerline mean
     smooth_data_scaled = rasterio.open(smooth_data).read(1)*scaling
     return smooth_data_scaled, scaling
+
+def distance_scaling_correction(data_vals1, data_vals2, distance, polyfit_order=2, filter_std=None):
+    '''
+    Correct smoothed data products based on a scaling from relative distance from centerline
+    :param data_vals1: input array/data product 1, e.g. raw data (array-like)
+    :param data_vals2: input data product 2--product to be corrected, e.g. smoothed data (array-like)
+    :param distance: relative distance of every point from feature(s), e.g. centerlines (array-like)
+    :param polyfit_order: order of the polynomial used to fit data, default 2 (int)
+    :param filter_std: filtering outliers based on st.dev, default None (numeric)
+    :return:
+    '''
+    x = distance.flatten()
+    y_ratio = np.divide(data_vals1, data_vals2)
+    y = y_ratio.flatten()
+
+    # Filter outliers, if desired
+    if filter_std != None:
+        mean = np.nanmean(y)
+        std = np.nanstd(y)
+        y[y > mean + (3*std)] = np.nan
+        
+    # Find binned average values
+    stat, edges, __ = binned_statistic(x, y, statistic=np.nanmean, bins=30, range=(x.min(), x.max()))
+    count, __, __ = binned_statistic(x, y, statistic='count', bins=30, range=(x.min(), x.max()))
+    bin_centers = edges[1:] - (abs(edges[0] - edges[1]))/2
+    
+    # Fit polynomial to values and use polynomial to derive values at each point
+    polyfit = np.polyfit(bin_centers[1:], stat[1:], polyfit_order)
+    scale_array = 0
+    for n in range(polyfit_order+1):
+        scale_array += (polyfit[::-1][n]*(distance**n))
+    
+    # Correct input data array
+    data_vals2_corr = data_vals2*scale_array
+    return data_vals2_corr
 
