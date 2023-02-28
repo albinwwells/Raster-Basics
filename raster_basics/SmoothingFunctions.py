@@ -175,7 +175,8 @@ def distance_scaling_correction(data_vals1, data_vals2, distance, polyfit_order=
     :return:
     '''
     x = distance.flatten()
-    y_ratio = np.divide(data_vals1, data_vals2)
+    y_ratio = np.where(data_vals2 == 0, 1, data_vals1/data_vals2)
+    # y_ratio = np.divide(data_vals1, data_vals2)
     y = y_ratio.flatten()
 
     # Filter outliers, if desired
