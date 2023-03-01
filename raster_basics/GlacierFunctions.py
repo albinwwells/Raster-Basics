@@ -111,8 +111,6 @@ def demAspect(dem_array, res):
     """
     aspect_array = np.zeros_like(dem_array)
     py, px = np.gradient(dem_array, res)
-    print(px)
-    print(py)
 
     for i in range(len(aspect_array)):
         for j in range(len(aspect_array[0])):
