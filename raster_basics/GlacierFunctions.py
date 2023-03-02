@@ -54,7 +54,7 @@ def divQ(vx, vy, h, res, vCol=0.8):
                   (np.gradient(vy * -1, res)[0] * h) + (np.gradient(h * -1, res)[0] * vy)) * vCol
     return divQarray
 
-def flux_div_comps(vx, vy, h, res, vCol=0.8, filter=True, filter_factor=4):
+def flux_div_comps(vx, vy, h, res, vCol=0.8, filt=True, filter_factor=4):
     """
     Flux divergence - return each component as well
 	vx, vy: x- and y-direction velocity, m/yr (array-like)
