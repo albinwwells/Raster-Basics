@@ -9,7 +9,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 from scipy import stats
-from raster_basics.smoothingFunctions import dynamicSmoothing
+from raster_basics.SmoothingFunctions import dynamicSmoothing
 
 
 def glacierArea(outline, res):
