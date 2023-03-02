@@ -143,6 +143,45 @@ def dynamicSmoothing(z, window_weight, pixel_size, f):
             else:
                 smooth_file[r, c] = 0           # we don't want to smooth 0 regions so we leave these as 0
     return smooth_file
+
+def dynamicSmoothingExponential(z, window_weight, pixel_size, f, max_size=2500):
+    '''
+    Exponential filter, dynamic smoothing with changing pixel window size
+    :param z: input file (array)
+    :param window_weight: weight of window size (thickness file)
+    :param pixel_size: size of pixel (resolution)
+    :param f: factor of window size from window weight (4 for vx, vy, h. 1 for divQ)
+    :param max_size: maximum window size for smoothing (int)
+    :return: array of smoothed values
+    '''
+
+    # Apply a border of zeros based on the half size
+    half_size = int((max_size / pixel_size) + 1)
+    pad = np.max(half_size) + 2
+    r = z.shape[0]
+    c = z.shape[1]
+    lr_border = np.zeros((r, pad), dtype=int)                    # left/right border
+    tb_border = np.zeros((pad, c + (2*pad)), dtype=int)          # top/bottom border
+    x = z.copy()
+    x = np.concatenate((lr_border, x), axis=1)
+    x = np.concatenate((x, lr_border), axis=1)
+    x = np.concatenate((tb_border, x), axis=0)
+    x = np.concatenate((x, tb_border), axis=0)
+    
+    row_i, col_j = np.indices((half_size*2+1, half_size*2+1))
+    smooth_file = np.zeros(z.shape)         # initiate array to store each smooth pixel
+    for r in range(z.shape[0]):
+        for c in range(z.shape[1]):
+            if window_weight[r, c] != 0:
+                # add the border size to start at actual values
+                pixel_window = x[r+pad-half_size:r+pad+half_size+1, c+pad-half_size:c+pad+half_size+1]
+                exp_weights = np.exp(-np.sqrt(((half_size - row_i)*pixel_size)**2 + 
+                                              ((half_size - col_j)*pixel_size)**2)/(f*window_weight[r,c]))
+                exp_weights /= np.sum(exp_weights)  # adjust weights to sum to 1
+                smooth_file[r, c] = np.sum(pixel_window*exp_weights)
+            else:
+                smooth_file[r, c] = 0           # we don't want to smooth 0 regions so we leave these as 0
+    return smooth_file
     
 def smoothingCorrection(orig_data, smooth_data, centerlines):
     '''
