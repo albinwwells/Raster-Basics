@@ -9,6 +9,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 from scipy import stats
+from raster_basics.smoothingFunctions import dynamicSmoothing
 
 
 def glacierArea(outline, res):
@@ -53,18 +54,25 @@ def divQ(vx, vy, h, res, vCol=0.8):
                   (np.gradient(vy * -1, res)[0] * h) + (np.gradient(h * -1, res)[0] * vy)) * vCol
     return divQarray
 
-def flux_div_comps(vx, vy, h, res, vCol=0.8):
+def flux_div_comps(vx, vy, h, res, vCol=0.8, filter=True, filter_factor=4):
     """
     Flux divergence - return each component as well
 	vx, vy: x- and y-direction velocity, m/yr (array-like)
 	h: glacier thickness, m (array-like)
 	res: pixel resolution (int or float)
 	vCol: vertical-average velocity scaling factor, typically 0.8 (int or float)
+	filter: whether or not to smooth derivatives
+	filter_factor: smoothing factor for filtering
     """
     dvx = (np.gradient(vx, res)[1] * h) * vCol
-    dvy = (np.gradient(vy * -1, res)[0] * h) * vCol 
+    dvy = (np.gradient(vy * -1, res)[0] * h) * vCol
     dhx = (np.gradient(h, res)[1] * vx) * vCol
     dhy = (np.gradient(h * -1, res)[0] * vy) * vCol
+    if filter == True:
+        dvx = dynamicSmoothing(dvx, h, res, filter_factor)
+        dvy = dynamicSmoothing(dvy, h, res, filter_factor)
+        dhx = dynamicSmoothing(dhx, h, res, filter_factor)
+        dhy = dynamicSmoothing(dhy, h, res, filter_factor)
     divQ = dvx + dvy + dhx + dhy
     return divQ, dvx, dvy, dhx, dhy
 
