@@ -9,7 +9,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 from scipy import stats
-from raster_basics.SmoothingFunctions import dynamicSmoothing
+from raster_basics.SmoothingFunctions import dynamicSmoothing, dynamicSmoothingExponential
 
 
 def glacierArea(outline, res):
@@ -54,14 +54,15 @@ def divQ(vx, vy, h, res, vCol=0.8):
                   (np.gradient(vy * -1, res)[0] * h) + (np.gradient(h * -1, res)[0] * vy)) * vCol
     return divQarray
 
-def flux_div_comps(vx, vy, h, res, vCol=0.8, filt=True, filter_factor=4):
+def flux_div_comps(vx, vy, h, res, vCol=0.8, filt=True, filter_type='Gauss', filter_factor=4):
     """
     Flux divergence - return each component as well
 	vx, vy: x- and y-direction velocity, m/yr (array-like)
 	h: glacier thickness, m (array-like)
 	res: pixel resolution (int or float)
 	vCol: vertical-average velocity scaling factor, typically 0.8 (int or float)
-	filter: whether or not to smooth derivatives
+	filt: whether or not to smooth derivatives
+	filter_type: type of filter, either 'Gauss' or 'Exp'
 	filter_factor: smoothing factor for filtering
     """
     dvx = (np.gradient(vx, res)[1] * h) * vCol
@@ -69,10 +70,16 @@ def flux_div_comps(vx, vy, h, res, vCol=0.8, filt=True, filter_factor=4):
     dhx = (np.gradient(h, res)[1] * vx) * vCol
     dhy = (np.gradient(h * -1, res)[0] * vy) * vCol
     if filt == True:
-        dvx = dynamicSmoothing(dvx, h, res, filter_factor)
-        dvy = dynamicSmoothing(dvy, h, res, filter_factor)
-        dhx = dynamicSmoothing(dhx, h, res, filter_factor)
-        dhy = dynamicSmoothing(dhy, h, res, filter_factor)
+        if filter_type == 'Gauss':
+            dvx = dynamicSmoothing(dvx, h, res, filter_factor)
+            dvy = dynamicSmoothing(dvy, h, res, filter_factor)
+            dhx = dynamicSmoothing(dhx, h, res, filter_factor)
+            dhy = dynamicSmoothing(dhy, h, res, filter_factor)
+        elif filter_type == 'Exp':
+            dvx = dynamicSmoothingExponential(dvx, h, res, filter_factor)
+            dvy = dynamicSmoothingExponential(dvy, h, res, filter_factor)
+            dhx = dynamicSmoothingExponential(dhx, h, res, filter_factor)
+            dhy = dynamicSmoothingExponential(dhy, h, res, filter_factor)
     divQ = dvx + dvy + dhx + dhy
     return divQ, dvx, dvy, dhx, dhy
 
