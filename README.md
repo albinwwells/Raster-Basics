@@ -82,6 +82,7 @@ There are a few more functions to help produce specific plots and glacier calcul
   - `sgolay2d`: Savitzky-Golay smoothing filter to eliminate high frequency noise via moving average; a low-pass filter
   - `gaussianFilter`: Gaussian (normal) smoothing filter
   - `dynamicSmoothing`: Gaussian filter, dynamic smoothing with changing pixel window size
+  - `dynamicSmoothingExponential`: Exponential filter, dynamic smoothing with changing pixel window size
   - `smoothingCorrection`: Apply a correction to smoothed data products, such that smoothing does not decrease the mean values. Correction is based on glacier centerline values
   - `distance_scaling_correction`: corrects a smoothed data products based on a scaling from relative distance from centerline
 
