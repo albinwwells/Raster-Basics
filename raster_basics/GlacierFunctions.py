@@ -68,7 +68,7 @@ def flux_div_comps(vx, vy, h, res, vCol=0.8, filt=True, filter_factor=4):
     dvy = (np.gradient(vy * -1, res)[0] * h) * vCol
     dhx = (np.gradient(h, res)[1] * vx) * vCol
     dhy = (np.gradient(h * -1, res)[0] * vy) * vCol
-    if filter == True:
+    if filt == True:
         dvx = dynamicSmoothing(dvx, h, res, filter_factor)
         dvy = dynamicSmoothing(dvy, h, res, filter_factor)
         dhx = dynamicSmoothing(dhx, h, res, filter_factor)
