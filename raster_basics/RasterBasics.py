@@ -80,6 +80,7 @@ def shpClip(geotiff, shapefile, destination, nan_val=0, fill=True, pad_size=0, c
 	nan_val: NaN value (int or float)
 	fill: If True, the pixels outside the features will be set to nan_val. If False, the output array will contain the original pixel data, and only the mask will be based on shapes (boolean) 
 	pad_size: width of padding in pixels (int or float)    
+	crop: whether to crop the raster to the extent of the shapes
     """
     
     with rasterio.open(geotiff) as src:
