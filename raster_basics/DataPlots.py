@@ -601,7 +601,7 @@ def plotDataPoints(dataVals1, cbarTitle1, color1, dataVals2, cbarTitle2, color2,
     else:
     	plt.show()
 
-def velPlot(vx, vy, v_tot, area, threshold):
+def velPlot(vx, vy, v_tot, pixel_size, threshold):
     '''
     Show velocity vector arrows
     :param vx1: x-direction velocity
@@ -612,7 +612,7 @@ def velPlot(vx, vy, v_tot, area, threshold):
     :return:
     '''
     # fig, ax = plt.subplots()                                  # uncomment lines to plot this graph separately
-    if area/1000000 > 10:
+    if pixel_size < 10:
         freq = 20
     else:
         freq = 10
