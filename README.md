@@ -58,6 +58,7 @@ There are a few more functions to help produce specific plots and glacier calcul
   - `demHillshade`: create a hillshade from a DEM
   - `velocityAspect`: returns the aspect of velocity based on vx and vy
   - `velAspectAngle`: get the angle between two arrays of velocity aspect
+  - `velFlowlineAspect`: return the aspect of every pixel based on a shapely geometry flowline
  
 ## Example Base Functions
   - `glacierOutline`: uses a shapefile and raster array of ones to create a binary array of glacier terrain (1 is glacier, 0 is off-glacier)
