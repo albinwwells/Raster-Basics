@@ -152,7 +152,7 @@ def velFlowlineAspect(linestring, array, arr_extent):
     x, y = np.meshgrid(np.arange(arr_extent[0], arr_extent[2]+1), np.arange(arr_extent[1], arr_extent[3]+1))
     
     # iterate through velocity array
-    for i in tqdm(range(len(array))): 
+    for i in range(len(array)): 
         for j in range(len(array[0])):
             point = Point(x[i,j], y[i,j]) # find our point in json coordinates
             closest_point = linestring.interpolate(linestring.project(point)) # find the nearest point on linestring
