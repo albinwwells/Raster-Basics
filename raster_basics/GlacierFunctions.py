@@ -9,6 +9,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 from scipy import stats
+from shapely.geometry import Point
 from raster_basics.SmoothingFunctions import dynamicSmoothing, dynamicSmoothingExponential
 
 
@@ -137,6 +138,41 @@ def demAspect(dem_array, res):
             elif pixel_deg > 90:
                 pixel_aspect = 450 - pixel_deg
             aspect_array[i][j] = pixel_aspect
+    return aspect_array
+
+
+def velFlowlineAspect(linestring, array, arr_extent):
+    '''
+    Use flowline as velocity direction. Returns array of aspects, based on the flowline
+    # linestring: center flowline json object. Type: shapely.geometry.linestring.LineString
+    # array: 2D numpy array, output aspect will be the same size
+    # arr_extent: Array extent in shapely geometry coordinates (left, bottom, right, top) 
+    '''
+    aspect_array = np.zeros_like(array)
+    x, y = np.meshgrid(np.arange(arr_extent[0], arr_extent[2]+1), np.arange(arr_extent[1], arr_extent[3]+1))
+    
+    # iterate through velocity array
+    for i in tqdm(range(len(array))): 
+        for j in range(len(array[0])):
+            point = Point(x[i,j], y[i,j]) # find our point in json coordinates
+            closest_point = linestring.interpolate(linestring.project(point)) # find the nearest point on linestring
+            coords = np.array(linestring.coords)
+            dists = np.linalg.norm(coords - closest_point.coords, axis=1)
+            closest_idx = np.argmin(dists) # find the index of the closest point on the line
+
+            if closest_idx == 0: # check if nearest point is endpoint
+                prev_point = coords[closest_idx]
+                next_point = coords[closest_idx + 2]
+            elif closest_idx == len(np.array(linestring.coords)) - 1:
+                prev_point = coords[closest_idx - 2]
+                next_point = coords[closest_idx]
+            else:
+                prev_point = coords[closest_idx - 1]
+                next_point = coords[closest_idx + 1]
+
+            # angle of perpendicular line -- perpendicular line is -1/m, so we input (-x, y) instead of (y, x)
+            aspect_angle = np.rad2deg(np.arctan2(prev_point[0] - next_point[0], next_point[1] - prev_point[1]))
+            aspect_array[i][j] = aspect_angle # add to array of aspects
     return aspect_array
 
 
