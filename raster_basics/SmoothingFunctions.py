@@ -91,13 +91,13 @@ def sgolay2d(z, window_size, order, derivative=None):
         r = np.linalg.pinv(A)[2].reshape((window_size, -1))
         return scipy.signal.fftconvolve(Z, -r, mode='valid'), scipy.signal.fftconvolve(Z, -c, mode='valid')
 
-def gaussianFilter(z, st_dev, truncate=4, fill_mode=‘constant’, fill_val=0):
+def gaussianFilter(z, st_dev, truncate=4, fill_mode='constant', fill_val=0):
     '''
     Gaussian smoothing filter
     :param z: input file (open, read raster file; array-like)
     :param st_dev: standard deviation for filter. higher value indicates greater blur
     :param fill_mode: parameter that determines how the input array is extended when the filter overlaps a border.
-    :param fill_val: value to fill past edges of input if mode is ‘constant’. Default is 0.0.
+    :param fill_val: value to fill past edges of input if mode is 'constant'. Default is 0.0.
     :return: new, smoothed array
     '''
     pixel_w = 2 * int(truncate * st_dev + 0.5) + 1      # compute pixel window width
