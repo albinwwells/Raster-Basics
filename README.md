@@ -59,6 +59,7 @@ There are a few more functions to help produce specific plots and glacier calcul
   - `velocityAspect`: returns the aspect of velocity based on vx and vy
   - `velAspectAngle`: get the angle between two arrays of velocity aspect
   - `velFlowlineAspect`: return the aspect of every pixel based on a shapely geometry flowline
+  - `distance_from_line`: get an array representing the distance of every pixel from any True value in an array
  
 ## Example Base Functions
   - `glacierOutline`: uses a shapefile and raster array of ones to create a binary array of glacier terrain (1 is glacier, 0 is off-glacier)
