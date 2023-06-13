@@ -205,12 +205,13 @@ def smoothingCorrection(orig_data, smooth_data, centerlines):
     smooth_data_scaled = rasterio.open(smooth_data).read(1)*scaling
     return smooth_data_scaled, scaling
 
-def distance_scaling_correction(data_vals1, data_vals2, distance, polyfit_order=2, filter_std=None):
+def distance_scaling_correction(data_vals1, data_vals2, distance, outline=None, polyfit_order=2, filter_std=None):
     '''
     Correct smoothed data products based on a scaling from relative distance from centerline
     :param data_vals1: input array/data product 1, e.g. raw data (array-like)
     :param data_vals2: input data product 2--product to be corrected, e.g. smoothed data (array-like)
     :param distance: relative distance of every point from feature(s), e.g. centerlines (array-like)
+    :param outline: glacier outline (Boolean array)
     :param polyfit_order: order of the polynomial used to fit data, default 2 (int)
     :param filter_std: filtering outliers based on st.dev, default None (numeric)
     :return:
@@ -220,6 +221,8 @@ def distance_scaling_correction(data_vals1, data_vals2, distance, polyfit_order=
     # y_ratio = np.divide(data_vals1, data_vals2)
     y = y_ratio.flatten()
 
+    if outline is None: # if no outline given, consider all array values
+        outline = np.ones_like(distance)
     out = outline.flatten()
     y[out == 0] = -1
     x[out == 0] = -1
