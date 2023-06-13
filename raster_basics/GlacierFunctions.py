@@ -9,6 +9,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 from scipy import stats
+from scipy.ndimage import distance_transform_edt
 from shapely.geometry import Point
 from raster_basics.SmoothingFunctions import dynamicSmoothing, dynamicSmoothingExponential
 
@@ -358,4 +359,20 @@ def stress_vel_plot(dem_slope, thickness, vel, title, slope_threshold=60, showPl
     ax.set_ylim(bottom=0, top=new_vel.max())
     plt.grid()
     plt.show(block=showPlot)
+
+def distance_from_line(line_array, res, mask=None):
+    '''
+    Calculate the Euclidean distance from centerline array
+    :param line_array: Boolean array input to calculate distance from. Distance is calculate from true values
+    :param res: Array Euclidean spacing (resoluion) -- numerical
+    :param mask: Boolean array mask for on/off glacier terrain (default None takes entire array as on-glacier)
+    :return: Array of distance values from line array  
+    '''
+    
+    if mask is None: # if not mask is input, we create a mask that includes all values in array
+        mask = np.ones_like(line_array) 
+        
+    distance_array = distance_transform_edt(np.logical_not(line_array), sampling=[res, res]) # calculate distance
+    distance_array[mask == 0] = 0 # remove off-glacier terrain
+    return distance_array
 
