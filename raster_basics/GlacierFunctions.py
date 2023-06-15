@@ -177,6 +177,75 @@ def velFlowlineAspect(linestring, array, arr_extent):
     return aspect_array
 
 
+def velFlowlineOutlineAspect(linestring, outlinestring, dem_array, relative_distance_array, arr_extent):
+    '''
+    Use flowline/outline as velocity direction. Returns array of aspects, based on the flowline and outline.
+    The direction is a combination of the flowline/outline direction, weighted by the distance from each
+    # linestring: center flowline json object. Type: shapely.geometry.linestring.LineString
+    # outlinestring: glacier outline json object. Type: shapely.geometry.linestring.LineString
+    # dem_array: glacier dem (2D array)
+    # relative_distance_array: 2D numpy array, array of relative distance from centerline to outline (1 is at outline, 0 at centerline)
+    # arr_extent: Array extent in shapely geometry coordinates (left, bottom, right, top) 
+    '''
+    aspect_array = np.zeros_like(dem_array)
+    x, y = np.meshgrid(np.arange(arr_extent[0], arr_extent[2]+1), np.arange(arr_extent[1], arr_extent[3]+1))
+    
+    # iterate through velocity array
+    for i in range(len(dem_array)): 
+        for j in range(len(dem_array[0])):
+            point = Point(x[i,j], y[i,j]) # find our point in json coordinates
+            
+            # # aspect of the centerline
+            closest_point_cl = linestring.interpolate(linestring.project(point)) # find the nearest point on linestring
+            coords_cl = np.array(linestring.coords)
+            dists_cl = np.linalg.norm(coords_cl - closest_point_cl.coords, axis=1) # distances along line to point on line
+            closest_idx_cl = np.argmin(dists_cl) # find the index of the closest point on the line
+
+            if closest_idx_cl == 0: # check if nearest point is endpoint
+                prev_point = coords_cl[closest_idx_cl]
+                next_point = coords_cl[closest_idx_cl + 2]
+            elif closest_idx_cl == len(np.array(linestring.coords)) - 1:
+                prev_point_cl = coords_cl[closest_idx_cl - 2]
+                next_point_cl = coords_cl[closest_idx_cl]
+            else:
+                prev_point_cl = coords_cl[closest_idx_cl - 1]
+                next_point_cl = coords_cl[closest_idx_cl + 1]
+
+            # angle of perpendicular line -- perpendicular line is -1/m, so we input (-x, y) instead of (y, x)
+            aspect_angle_cl = np.rad2deg(np.arctan2(prev_point_cl[0] - next_point_cl[0], 
+                                                    next_point_cl[1] - prev_point_cl[1]))
+            
+            # # aspect of the outline
+            closest_point_ol = outlinestring.interpolate(outlinestring.project(point))
+            coords_ol = np.array(outlinestring.coords)
+            dists_ol = np.linalg.norm(coords_ol - closest_point_ol.coords, axis=1)
+            closest_idx_ol = np.argmin(dists_ol)
+            if closest_idx_ol == len(np.array(outlinestring.coords)) - 1:
+                prev_point_ol = coords_ol[closest_idx_ol - 1]
+                next_point_ol = coords_ol[0]
+            else:
+                prev_point_ol = coords_ol[closest_idx_ol - 1]
+                next_point_ol = coords_ol[closest_idx_ol + 1]
+            aspect_angle_olr = np.arctan2(prev_point_cl[0] - next_point_cl[0], next_point_cl[1] - prev_point_cl[1])
+            
+            # make sure outline aspect is in the right direction
+            test_i = round(np.cos(aspect_angle_olr)*3)
+            test_j = round(np.sin(aspect_angle_olr)*3)
+            dem_array_pad = np.pad(x, pad_width=5, mode='edge')
+            
+            aspect_angle_ol = np.rad2deg(aspect_angle_olr)
+            if dem_array_pad[5+i-test_i][5+j-test_j] < dem_array_pad[5+i+test_i][5+j+test_j]: # go toward the DEM low
+                if aspect_angle_ol > 180: # add/subtract 180 from the aspect to make sure aspect is in right direction
+                    aspect_angle_ol - 180
+                else:
+                    aspect_angle_ol + 180
+            
+            # add value to aspect array (interpolate aspect to)
+            aspect_array[i][j] = (relative_distance_array[i][j] * aspect_angle_ol + 
+                                  (1 - relative_distance_array[i][j]) * aspect_angle_cl)
+    return aspect_array
+
+
 def velocityAspect(vel_x, vel_y):
     # gets the aspect of velocity vectors, given input x- and y-direction velocity arrays
     vel_aspect = np.zeros_like(vel_x)
