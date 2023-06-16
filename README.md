@@ -59,6 +59,7 @@ There are a few more functions to help produce specific plots and glacier calcul
   - `velocityAspect`: returns the aspect of velocity based on vx and vy
   - `velAspectAngle`: get the angle between two arrays of velocity aspect
   - `velFlowlineAspect`: return the aspect of every pixel based on a shapely geometry flowline
+  -  `velFlowlineOutlineAspect`: return the aspect of every pixel based on a shapely geometry flowline and outline
   - `distance_from_line`: get an array representing the distance of every pixel from any True value in an array
  
 ## Example Base Functions
