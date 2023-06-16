@@ -210,29 +210,26 @@ def weighted_average(value1, value2, weight1, weight2):
     return average_deg
 
 
-def velFlowlineOutlineAspect(linestring, outlinestring, dem_array, relative_distance_array, arr_extent, mask):
+def velFlowlineOutlineAspect(linestring, outlinestring, relative_distance_array, arr_extent, mask):
     '''
     Use flowline/outline as velocity direction. Returns array of aspects, based on the flowline and outline.
     The direction is a combination of the flowline/outline direction, weighted by the distance from each
     # linestring: center flowline json object. Type: shapely.geometry.linestring.LineString
     # outlinestring: glacier outline json object. Type: shapely.geometry.linestring.LineString
-    # dem_array: glacier dem (2D array)
     # relative_distance_array: 2D numpy array, array of relative distance from centerline to outline (0 to 1)
     # arr_extent: Array extent in shapely geometry coordinates (left, bottom, right, top) 
     # mask: Glacier outline mask, 2D array (default None considers all values in arry)
     # returns: 2D array of velocity aspect based on flowline and outline
     '''
-    aspect_array = np.zeros_like(dem_array)
-    dem_aspect = demAspect(dem_array, array_res)
-    dem_aspect = np.where(dem_aspect > 180, dem_aspect - 360, dem_aspect)
+    aspect_array = np.zeros_like(relative_distance_array)
     
     x, y = np.meshgrid(np.arange(arr_extent[0], arr_extent[2]+1), np.arange(arr_extent[1], arr_extent[3]+1))
     if mask is None:
-        mask = np.ones_like(dem_array)
+        mask = np.ones_like(relative_distance_array)
     
     # iterate through velocity array
-    for i in range(len(dem_array)): 
-        for j in range(len(dem_array[0])):
+    for i in range(len(relative_distance_array)): 
+        for j in range(len(relative_distance_array[0])):
             if mask[i][j] == 1:
                 point = Point(x[i,j], y[i,j]) # find our point in json coordinates
 
