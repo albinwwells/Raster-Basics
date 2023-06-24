@@ -33,7 +33,7 @@ def show_fig(image, title=None, color='Spectral', ctitle='', bounds=None, res=No
     if savefig == True:
     	fig.savefig(title + '.jpg', dpi=500) # to save the plot as a jpg image
 
-def scatterplot(data, xtitle, ytitle, title, colors, labels, markers='.', xyLine=False, buff=100, savefig=False):
+def scatterplot(data, xtitle, ytitle, title, colors, labels, markers='.', alpha=0.7, xyLine=False, buff=100, savefig=False):
     """
 	Create a scatterplot from data
 		data: input data (list of arrays of length 2) (e.g. [[0, 0, 0, 0], [1, 2, 3, 4]] or [[[0, 0, 0], [1, 2, 3]], [[1, 1, 1, 1], [1, 2, 3, 4]]])
@@ -41,6 +41,7 @@ def scatterplot(data, xtitle, ytitle, title, colors, labels, markers='.', xyLine
 		colors: list of colors for each x-y scatterplot dataset (list of str, same length as data)
 		labels: legend label for data (list of str, same length as data) (e.g. ['label1', 'label2'])
 		markers: scatterplot marker (list of str, same length as data, or string if all markers should be the same)
+  		alpha: marker alpha value; transparency (float ranging 0 to 1)
 		xyLine: to show the 1-to-1 line (boolean)
 		buff: buffer on axis limits (int or float)
     """
@@ -52,7 +53,7 @@ def scatterplot(data, xtitle, ytitle, title, colors, labels, markers='.', xyLine
         markers = [markers] * len(data)
 
     for i, xy in enumerate(data):
-        ax.scatter(xy[0], xy[1], c=colors[i], alpha=0.7, marker=markers[i], label=labels[i])
+        ax.scatter(xy[0], xy[1], c=colors[i], alpha=alpha, marker=markers[i], label=labels[i])
     ax.set_xlabel(xtitle)
     ax.set_ylabel(ytitle)
     ax.legend()
