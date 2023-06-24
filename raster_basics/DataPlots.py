@@ -33,20 +33,23 @@ def show_fig(image, title=None, color='Spectral', ctitle='', bounds=None, res=No
     if savefig == True:
     	fig.savefig(title + '.jpg', dpi=500) # to save the plot as a jpg image
 
-def scatterplot(data, xtitle, ytitle, title, colors, labels, markers, xyLine=False, buff=100, savefig=False):
+def scatterplot(data, xtitle, ytitle, title, colors, labels, markers='.', xyLine=False, buff=100, savefig=False):
     """
 	Create a scatterplot from data
 		data: input data (list of arrays of length 2) (e.g. [[0, 0, 0, 0], [1, 2, 3, 4]] or [[[0, 0, 0], [1, 2, 3]], [[1, 1, 1, 1], [1, 2, 3, 4]]])
 		xtitle, ytitle: axis titles (str)
 		colors: list of colors for each x-y scatterplot dataset (list of str, same length as data)
 		labels: legend label for data (list of str, same length as data) (e.g. ['label1', 'label2'])
-		markers: scatterplot marker (list of str, same length as data)
+		markers: scatterplot marker (list of str, same length as data, or string if all markers should be the same)
 		xyLine: to show the 1-to-1 line (boolean)
 		buff: buffer on axis limits (int or float)
     """
     fig = plt.figure()
     ax = fig.add_subplot(111)
     plt.grid()
+    
+    if type(markers) == str:
+        markers = [markers] * len(data)
 
     for i, xy in enumerate(data):
         ax.scatter(xy[0], xy[1], c=colors[i], alpha=0.7, marker=markers[i], label=labels[i])
@@ -56,14 +59,15 @@ def scatterplot(data, xtitle, ytitle, title, colors, labels, markers, xyLine=Fal
     if xyLine == True:
         ax.axline([0, 0], [1, 1], c='k', ls='--', lw=1)
 
-    maximums = []
-    minimums = []
+    maximums_x, minimums_x, maximums_y, minimums_y = [], [], [], []
     for d in np.array(data):
-        maximums.append(max([max(d[0]), max(d[1])]) + buff)
-        minimums.append(min([min(d[0]), min(d[1])]) - buff)
+        maximums_x.append(np.nanmax(d[0]))
+        minimums_x.append(np.nanmin(d[0]))
+        maximums_y.append(np.nanmax(d[1]))
+        minimums_y.append(np.nanmin(d[1]))
 
-    ax.set_xlim([min(minimums), max(maximums)])
-    ax.set_ylim([min(minimums), max(maximums)])
+    ax.set_xlim([min(minimums_x) - buff, max(maximums_x) + buff])
+    ax.set_ylim([min(minimums_y) - buff, max(maximums_y) + buff])
     fig.suptitle(title, size=8)
     
     if savefig == True:
