@@ -8,10 +8,10 @@ import numpy as np
 from scipy import stats
 from .RasterBasics import shpClip
 
-def glacierOutline(ones_raster, shape, dest):
+def glacierOutline(ones_tif, shape, dest):
     """
 	Glacier outline
-		ones_raster: input array of ones to clip (array-like)
+		ones_raster: input raster of ones to clip (str) (e.g. 'ones.tif')
 		shape: glacier outline shapefline filepath (str) (e.g. 'outline.shp')
 		dest: output filename (str) (e.g. 'output.tif')
     """
