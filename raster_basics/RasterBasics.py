@@ -10,7 +10,7 @@ from rasterio.fill import fillnodata
 import rioxarray
 import xarray
 
-import glob, os
+import glob, os, warnings
 import numpy as np
 import math
 import matplotlib.pyplot as plt
