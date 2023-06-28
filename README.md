@@ -23,6 +23,7 @@ Dependencies to run `raster_basics` can be installed manually or via the `requir
  - `show_fig`: show geotiff as a matplotlib figure
  - `rasterLike`: save array as a raster
  - `shpReprojection`: reproject shapefile
+ - `shpBuffer`: add a buffer to shapefile
  - `shpClip`: clip geotiff by a shapefile
  - `tifReprojectionResample`: reproject, resample, and/or clip geotiff
  - `fillHole`: fill missing data in geotiff
