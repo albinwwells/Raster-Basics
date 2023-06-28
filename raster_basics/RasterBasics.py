@@ -25,6 +25,15 @@ import pandas as pd
 
 """ Simple way to plot raster file """
 
+def open(geotiff, band=1):
+     """
+	Open a raster file as an array
+		geotiff: input raster filename (e.g. 'raster.tif')
+		band: the band to read. Defaults to 1 (int)
+    """
+    array = rasterio.open(geotiff).read(band)
+    return array
+
 def show_fig(image, title=None, color='Spectral', ctitle='colorbar title', bounds=None, res=None, vmin=None, vmax=None, savefig=False):
     """
     Plotting a raster file
