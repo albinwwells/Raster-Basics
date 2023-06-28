@@ -72,7 +72,7 @@ def shpReprojection(shapefile, crs, dst='reprojected_shape.shp'):
     src.to_file(dst)
     
 
-def shpBuffer(shapefile, dist=100, dst='buffered_shape.shp')
+def shpBuffer(shapefile, dist=100, dst='buffered_shape.shp'):
     """
     Add a buffer around a shapefile. Note that the shapefile must be in a projected coordinate system (e.g. UTM)
         shapefile: input shapefile path (str) (e.g. 'input_shapefile.shp')
