@@ -25,7 +25,7 @@ import pandas as pd
 
 """ Simple way to plot raster file """
 
-def open(geotiff, band=1):
+def rOpen(geotiff, band=1):
      """
 	Open a raster file as an array
 		geotiff: input raster filename (e.g. 'raster.tif')
