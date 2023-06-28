@@ -51,6 +51,7 @@ def show_fig(image, title=None, color='Spectral', ctitle='colorbar title', bound
 """ Geoprocessing tools:
 
 	Reproject shapefile
+ 	Buffer shapefile
 	Clip shapefile
 	Reproject and clip geotiff
 	Fill missing geotiff data
@@ -70,6 +71,27 @@ def shpReprojection(shapefile, crs, dst='reprojected_shape.shp'):
     src = src.to_crs(crs)
     src.to_file(dst)
     
+
+def shpBuffer(shapefile, dist=100, dst='buffered_shape.shp')
+    """
+    Add a buffer around a shapefile. Note that the shapefile must be in a projected coordinate system (e.g. UTM)
+        shapefile: input shapefile path (str) (e.g. 'input_shapefile.shp')
+        dist: buffer distance, m (int, float) (500)
+        dst: output filename (str) (e.g. 'output_shapefile.shp')
+    """
+    shape = gpd.read_file(shapefile)
+    
+    if shape.crs.is_geographic == True: 
+        warnings.warn("The shapefile is in a geographic coordinate system. Reproject the shapefile and try again")
+        return None
+
+    # Create a buffer
+    buffered_data = shape.buffer(dist)
+
+    # Create a new GeoDataFrame with the buffered data
+    buffered_gdf = gpd.GeoDataFrame(geometry=buffered_data, crs=shape.crs)
+    buffered_gdf.to_file(dst) # save the buffered shapefile
+
 
 def shpClip(geotiff, shapefile, destination, nan_val=0, fill=True, pad_size=0, crop=True):
     """
