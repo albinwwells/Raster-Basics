@@ -20,7 +20,7 @@ All of the functions can be imported with:
 Dependencies to run `raster_basics` can be installed manually or via the `requirements.txt` file. Download the file, navigate to it's directory in the terminal, and install dependencies by typing `pip install -r requirements.txt` or `conda install --file requirements.txt`. If creating a new conda environment for `raster_basics`, you may also need to `conda install pip` initially. This should install all the dependencies needed to run the `raster_basics` module.
 
 ## Functions
- - `rOpen`: open a geotiff file as an array
+ - `rOpen`: open a geotiff file as an array, and/or get the geotiff resolution and coordinate system
  - `show_fig`: show geotiff as a matplotlib figure
  - `rasterLike`: save array as a raster
  - `shpReprojection`: reproject shapefile
