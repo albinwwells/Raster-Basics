@@ -22,18 +22,32 @@ import geopandas as gpd
 import pandas as pd
 
 
+""" Simple open a raster file """
 
-""" Simple way to plot raster file """
-
-def rOpen(geotiff, band=1):
+def rOpen(geotiff, band=1, returnArray=True, returnRes=False, returnCrs=False):
     """
-    Open a raster file as an array
+    Open a raster file as an array. Options to output raster resolution and coordinate system
         geotiff: input raster filename (e.g. 'raster.tif')
         band: the band to read. Defaults to 1 (int)
+        returnArray: return the raster as a numpy array. Default is True (bool)
+        returnRes: return the raster resolution; this returns a tuple. Default is False (bool)
+        returnCrs: return the raster coordinate system. Default is False (bool)
     """
-    array = rasterio.open(geotiff).read(band)
-    return array
+    vals = []
+    if returnArray == True:
+        array = rasterio.open(geotiff).read(band)
+        vals.append(array)
+    if returnRes == True:
+        res = rasterio.open(geotiff).res
+        vals.append(res)
+    if returnCrs == True:
+        crs = rasterio.open(geotiff).crs
+        vals.append(crs)
+    if len(vals) == 1:
+        vals = vals[0] 
+    return vals
 
+""" Simple way to plot raster file """
 
 def show_fig(image, title=None, color='Spectral', ctitle='colorbar title', bounds=None, res=None, vmin=None, vmax=None, savefig=False):
     """
