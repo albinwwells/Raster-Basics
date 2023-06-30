@@ -65,6 +65,7 @@ def show_fig(image, title=None, color='Spectral', ctitle='colorbar title', bound
     c = ax.imshow(image, cmap=color, extent=bounds, vmin=vmin, vmax=vmax)
     if res != None:
         ax.add_artist(ScaleBar(dx=res, units='m')) # add scalebar
+	ax.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
     fig.colorbar(c, label=ctitle)
     fig.suptitle(title)
     plt.show()
