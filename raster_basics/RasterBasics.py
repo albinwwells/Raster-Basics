@@ -280,6 +280,52 @@ def rasterLike(array, destination, geotiff):
         dst.write(array, 1)
 
 
+def rasterMath(geotiff1, geotiff2, eqn='-', interp=Resampling.cubic_spline, outfile=None):
+    '''
+    Perform basic math with two raster files, regardless of coordinate system, resolution, and extent
+        geotiff1: input raster filename. Note that the second raster will be reprojected and clipped based on this raster (e.g. 'raster1.tif')
+        geotiff2: input raster filename (e.g. 'raster2.tif')
+        eqn: raster math to perform; addition, subtraction, multiplication, or division. Add 'r' to reverse the order of input files for subtraction or division (to do geotiff2 - geotiff1 or geotiff2 / geotiff1) (e.g. '+', '-', '*', '/', '-r', '/r' OR 'add', 'sub', 'mult', 'div', 'subr', or 'divr')
+        interp: resampling interpolation method (Resampling method from rasterio.warp module)  (e.g. rasterio.warp.Resampling.cubic_spline)
+        outfile: output file to save raster. Output filename to save. If none, only the array is return (default: None) (str, e.g. 'output.tif')
+    '''
+    res = rOpen(geotiff1, returnArray=False, returnRes=True, returnCrs=False) # geotiff resolution
+    crs = rOpen(geotiff1, returnArray=False, returnRes=False, returnCrs=True) # geotiff coordinate system
+    ext = rasterio.open(geotiff1).bounds # geotiff bounds
+    arr = rOpen(geotiff1) # geotiff array
+    
+    res2 = rOpen(geotiff2, returnArray=False, returnRes=True, returnCrs=False) # geotiff resolution
+    crs2 = rOpen(geotiff2, returnArray=False, returnRes=False, returnCrs=True) # geotiff coordinate system
+    ext2 = rasterio.open(geotiff2).bounds # geotiff bounds
+    
+    if res == res2 and crs == crs2 and ext == ext2:
+        arr2 = rOpen(geotiff2) # if our geotiffs are aligned, we just take the second array
+    else: 
+        # otherwise we need to reproject and resample our array temporarily
+        tifReprojectionResample(geotiff2, 'temp_math_reproj.tif', crs=crs, res=res, 
+                                interp=interp, extent_file=geotiff1)
+        arr2 = rOpen('temp_math_reproj.tif')
+        os.remove('temp_math_reproj.tif')
+
+    # perform the arithmetic
+    if eqn == '-' or eqn == 'sub':
+        math_arr = np.subtract(arr, arr2)
+    elif eqn == '+' or eqn == 'add':
+        math_arr = np.add(arr, arr2)
+    elif eqn == '*' or eqn == 'mult':
+        math_arr = np.multiply(arr, arr2)
+    elif eqn == '/' or eqn == 'div':
+        math_arr = np.divide(arr, arr2)
+    elif eqn == '-r' or eqn == 'subr':
+        math_arr = np.subtract(arr2, arr)
+    elif eqn == '/r' or eqn == 'divr':
+        math_arr = np.divide(arr2, arr)    
+        
+    if outfile != None: # save as geotiff
+        rasterLike(math_arr, outfile, geotiff1)      
+    return math_arr
+
+
 """ Extra functions for sampling along lines """
 
 
