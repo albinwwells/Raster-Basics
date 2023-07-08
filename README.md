@@ -27,6 +27,7 @@ Dependencies to run `raster_basics` can be installed manually or via the `requir
  - `shpBuffer`: add a buffer to shapefile
  - `shpClip`: clip geotiff by a shapefile
  - `tifReprojectionResample`: reproject, resample, and/or clip geotiff
+ - `rasterMath`: perform basic arithmetic on two raster files (even if they have difference crs, res, and/or extents)
  - `fillHole`: fill missing data in geotiff
  - `mosaic_files`: mosaic two or more geotiffs together
  - `extract_along_line`: sample for points on a line (this uses geocoordinate points as line)
