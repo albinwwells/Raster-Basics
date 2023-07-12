@@ -48,6 +48,7 @@ There are a few more functions to help produce specific plots and glacier calcul
  - `from raster_basics.BaseFunctions import FUNCTION_NAME`
  - `from raster_basics.DataPlots import FUNCTION_NAME`
  - `from raster_basics.SmoothingFunctions import FUNCTION_NAME`
+ - `from raster_basics.NoiseFunctions import FUNCTION_NAME`
  
  where `FUNCTION_NAME` is the name of the desired function.
  
@@ -91,5 +92,8 @@ There are a few more functions to help produce specific plots and glacier calcul
   - `dynamicSmoothingExponential`: Exponential filter, dynamic smoothing with changing pixel window size
   - `smoothingCorrection`: Apply a correction to smoothed data products, such that smoothing does not decrease the mean values. Correction is based on glacier centerline values
   - `distance_scaling_correction`: corrects a smoothed data products based on a scaling from relative distance from centerline
+
+## Example Noise Functions
+  - `add_grf_noise`: Introduce spatially-correlated noise via Gaussian random fields
 
 
