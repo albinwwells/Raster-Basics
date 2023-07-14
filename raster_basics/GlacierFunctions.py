@@ -4,7 +4,6 @@ import rasterio
 import rasterio.plot
 import rasterio.mask
 import earthpy.spatial as es
-import richdem as rd
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -86,20 +85,21 @@ def flux_div_comps(vx, vy, h, res, vCol=0.8, filt=True, filter_type='Gauss', fil
     return divQ, dvx, dvy, dhx, dhy
 
 
-def glacierAttributes(dem_rast, attrFormat):
-    # return desired attribute (attrFormat is 'slope_degree' or 'slope_percentage', 'slope_riserun', 'aspect')
-    # https://richdem.readthedocs.io/en/latest/python_api.html#richdem.rdarray
-    # gdal.DEMProcessing('slope.tif', dem_rast, 'slope', slopeFormat=slopeFormat)
-    # with rasterio.open('slope.tif') as dataset:
-    #     slope = dataset.read(1)
-    #     slope[slope == -9999.0] = 0
-    no_data_val = rasterio.open(dem_rast).nodatavals[0]
-    if no_data_val == None:
-        dem_array = rd.LoadGDAL(dem_rast, no_data=-9999.0)  # assign a No Data value if none is prescribed
-    else:
-        dem_array = rd.LoadGDAL(dem_rast)
-    attr_array = rd.TerrainAttribute(dem_array, attrib=attrFormat)
-    return attr_array
+# import richdem as rd
+# def glacierAttributes(dem_rast, attrFormat):
+#     # return desired attribute (attrFormat is 'slope_degree' or 'slope_percentage', 'slope_riserun', 'aspect')
+#     # https://richdem.readthedocs.io/en/latest/python_api.html#richdem.rdarray
+#     # gdal.DEMProcessing('slope.tif', dem_rast, 'slope', slopeFormat=slopeFormat)
+#     # with rasterio.open('slope.tif') as dataset:
+#     #     slope = dataset.read(1)
+#     #     slope[slope == -9999.0] = 0
+#     no_data_val = rasterio.open(dem_rast).nodatavals[0]
+#     if no_data_val == None:
+#         dem_array = rd.LoadGDAL(dem_rast, no_data=-9999.0)  # assign a No Data value if none is prescribed
+#     else:
+#         dem_array = rd.LoadGDAL(dem_rast)
+#     attr_array = rd.TerrainAttribute(dem_array, attrib=attrFormat)
+#     return attr_array
 
 def glacierSlope(array, res):
     """
