@@ -89,10 +89,11 @@ There are a few more functions to help produce specific plots and glacier calcul
   - `gaussianFilter`: Gaussian (normal) smoothing filter
   - `dynamicSmoothing`: Gaussian filter, dynamic smoothing with changing pixel window size
   - `dynamicSmoothingExponential`: Exponential filter, dynamic smoothing with changing pixel window size
-  - `smoothingCorrection`: Apply a correction to smoothed data products, such that smoothing does not decrease the mean values. Correction is based on glacier centerline values
+  - `smoothingCorrection`: Apply a correction to smoothed data products, such that smoothing does not decrease the mean values Correction is based on glacier centerline values
   - `distance_scaling_correction`: corrects a smoothed data products based on a scaling from relative distance from centerline
 
 ## Example Noise Functions
   - `add_grf_noise`: Introduce spatially-correlated noise via Gaussian random fields
+  - `add_ice_thickness_bias`: Add ice thickness bias based on parabolic vs V-shape bed cross-section assumption
 
 
