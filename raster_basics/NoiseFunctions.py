@@ -30,3 +30,32 @@ def add_grf_noise(array, array_res, correlation_length, noise_strength):
     array_noisy = np.where(grf_array_noise < 0, 0, grf_array_noise) # Ensure that velocity values remain positive
     return array_noisy
 
+
+def add_ice_thickness_bias(ice_thickness, relative_distance, comp_factor=3, direction='UV'):
+    """
+    Add bias to the ice thickness data based on the relative distance from the glacier center. This assumes bias in ice thickness 
+    relative to distance from centerline resulting from inaccurate bed profile assumption during ice thickness inversion
+
+    :param ice_thickness: array of ice thickness values. (np array)
+    :param relative_distance: array of relative distances from the glacier centerline to edge (np array)
+    :param comp_factor: comparison factor for the V to U-shaped cross-sections. Default of 3 gives max of 20% thickness change. Lower values add greater bias (numeric)
+    :param direction: direction of bias, either 'UV' or 'VU'. 'UV' assumes our modeled ice thickness is a parabola and reality is a V. 'VU' assumes the opposite case (str)
+    
+    Returns: array of ice thickness values with added bias, and the bias factor
+    """
+
+    # apply bias based on the relative distance 
+    # we use a 4th order parabolic function, following from the shallow-ice approximation
+    # we use a V-shape function with the same mean as the parabola
+    bias_factor = ((relative_distance ** 4) + (3/5) + comp_factor) / ((8/5) * relative_distance + comp_factor)
+
+    # Add the bias to the ice thickness data
+    if direction == 'VU':
+        bias_factor = 1 / bias_factor
+    
+    ice_thickness_bias = ice_thickness * bias_factor
+
+    return ice_thickness_bias, bias_factor
+
+
+
