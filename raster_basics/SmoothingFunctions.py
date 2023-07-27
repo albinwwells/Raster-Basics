@@ -105,28 +105,52 @@ def gaussianFilter(z, st_dev, truncate=4, fill_mode='constant', fill_val=0):
     gaussian = scipy.ndimage.filters.gaussian_filter(z, st_dev, truncate=truncate, mode=fill_mode, cval=fill_val)
     return gaussian
 
-def dynamicSmoothing(z, window_weight, pixel_size, f):
+def add_array_border(array, b_size, border_value='nearest'):
+    """
+    Add a border of a specified size to a 2D NumPy array.
+    :param array (numpy.ndarray): The input 2D array.
+    :param b_size (int): The size of the border to be added on each side of the array.
+    :param border_value (str or float): The value to use for the border. If numeric, the border will be filled with that constant value. If 'nearest', the border will be filled with the nearest value.
+    Returns np array with the added border
+    """
+    rows, cols = array.shape
+    bordered_array = np.zeros((rows + 2 * b_size, cols + 2 * b_size), dtype=array.dtype)
+    
+    if isinstance(border_value, (int, float)) == True:
+        bordered_array[:, :] = border_value  # Set the border to a constant value (e.g., np.nan)
+    elif border_value == 'nearest':
+        bordered_array[:b_size, b_size:b_size+cols] = array[0, :] # Top edge
+        bordered_array[-b_size:, b_size:b_size+cols] = array[-1, :] # Bottom edge
+        bordered_array[b_size:b_size+rows, :b_size] = array[:, 0].reshape(-1, 1) # Left edge
+        bordered_array[b_size:b_size+rows, -b_size:] = array[:, -1].reshape(-1, 1) # Right edge
+
+        # Corners
+        bordered_array[:b_size, :b_size] = array[0, 0]
+        bordered_array[:b_size, -b_size:] = array[0, -1]
+        bordered_array[-b_size:, :b_size] = array[-1, 0]
+        bordered_array[-b_size:, -b_size:] = array[-1, -1]
+    else:
+        raise ValueError("Invalid 'border_value'. Use a value for a constant border or 'nearest'.")
+
+    # Copy the original array to the center of the bordered array
+    bordered_array[b_size:b_size+rows, b_size:b_size+cols] = array
+    return bordered_array
+
+def dynamicSmoothing(z, window_weight, pixel_size, f=1, border_val='nearest'):
     '''
     Gaussian filter, dynamic smoothing with changing pixel window size
     :param z: input file (array)
     :param window_weight: weight of window size (thickness file)
     :param pixel_size: size of pixel (resolution)
     :param f: factor of window size from window weight (4 for vx, vy, h. 1 for divQ)
+    :param border_val: value to add for smoothing border. Either a constant value or the array nearest value (int, float, or str 'nearest')
     :return: array of smoothed values
     '''
 
     # Apply a border of zeros based on the half size
     half_size_max = int(np.max(window_weight) / pixel_size) * f
     pad = np.max(half_size_max) + 2
-    r = z.shape[0]
-    c = z.shape[1]
-    lr_border = np.zeros((r, pad), dtype=int)                    # left/right border
-    tb_border = np.zeros((pad, c + (2*pad)), dtype=int)          # top/bottom border
-    x = z.copy()
-    x = np.concatenate((lr_border, x), axis=1)
-    x = np.concatenate((x, lr_border), axis=1)
-    x = np.concatenate((tb_border, x), axis=0)
-    x = np.concatenate((x, tb_border), axis=0)
+    x = add_array_border(z, pad, border_value=border_val)
 
     smooth_file = np.zeros(z.shape)         # initiate array to store each smooth pixel
     for r in range(z.shape[0]):
@@ -146,7 +170,7 @@ def dynamicSmoothing(z, window_weight, pixel_size, f):
                 smooth_file[r, c] = 0           # we don't want to smooth 0 regions so we leave these as 0
     return smooth_file
 
-def dynamicSmoothingExponential(z, window_weight, pixel_size, f, max_size=2500):
+def dynamicSmoothingExponential(z, window_weight, pixel_size, f=1, max_size=2500, border_val='nearest'):
     '''
     Exponential filter, dynamic smoothing with changing pixel window size
     :param z: input file (array)
@@ -154,21 +178,14 @@ def dynamicSmoothingExponential(z, window_weight, pixel_size, f, max_size=2500):
     :param pixel_size: size of pixel (resolution)
     :param f: factor of window size from window weight (4 for vx, vy, h. 1 for divQ)
     :param max_size: maximum window size for smoothing (int)
+    :param border_val: value to add for smoothing border. Either a constant value or the array nearest value (int, float, or str 'nearest')
     :return: array of smoothed values
     '''
 
     # Apply a border of zeros based on the half size
     half_size = int((max_size / pixel_size) + 1)
     pad = np.max(half_size) + 2
-    r = z.shape[0]
-    c = z.shape[1]
-    lr_border = np.zeros((r, pad), dtype=int)                    # left/right border
-    tb_border = np.zeros((pad, c + (2*pad)), dtype=int)          # top/bottom border
-    x = z.copy()
-    x = np.concatenate((lr_border, x), axis=1)
-    x = np.concatenate((x, lr_border), axis=1)
-    x = np.concatenate((tb_border, x), axis=0)
-    x = np.concatenate((x, tb_border), axis=0)
+    x = add_array_border(z, pad, border_value=border_val)
     
     row_i, col_j = np.indices((half_size*2+1, half_size*2+1))
     smooth_file = np.zeros(z.shape)         # initiate array to store each smooth pixel
