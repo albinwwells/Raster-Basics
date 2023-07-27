@@ -29,6 +29,7 @@ Dependencies to run `raster_basics` can be installed manually or via the `requir
  - `tifReprojectionResample`: reproject, resample, and/or clip geotiff
  - `rasterMath`: perform basic arithmetic on two raster files (even if they have difference crs, res, and/or extents)
  - `fillHole`: fill missing data in geotiff
+ - `fillArrayHole`: helper function for `fillHole`, but works directly with arrays
  - `mosaic_files`: mosaic two or more geotiffs together
  - `extract_along_line`: sample for points on a line (this uses geocoordinate points as line)
  - `points_along_lines`: sample for points on a line (this uses a shapefile line)
@@ -89,6 +90,7 @@ There are a few more functions to help produce specific plots and glacier calcul
   - `gaussianFilter`: Gaussian (normal) smoothing filter
   - `dynamicSmoothing`: Gaussian filter, dynamic smoothing with changing pixel window size
   - `dynamicSmoothingExponential`: Exponential filter, dynamic smoothing with changing pixel window size
+  - `add_array_border`: Helper function to add a border around an array in `dynamicSmoothing` and `dynamicSmoothingExponential`
   - `smoothingCorrection`: Apply a correction to smoothed data products, such that smoothing does not decrease the mean values Correction is based on glacier centerline values
   - `distance_scaling_correction`: corrects a smoothed data products based on a scaling from relative distance from centerline
 
