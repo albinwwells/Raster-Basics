@@ -220,6 +220,21 @@ def tifReprojectionResample(file, reprojected_tif, crs, res, interp, extent_file
             os.remove('temp_output.tif')
 
 
+def fillArrayHoles(arr, fillmask, dist=10, iters=1):
+    '''
+    Fill hole in array
+    	arr: array to fill holes (np array)
+     	fillmask: mask where to fill holes. hole-filling applied where mask=0 (np array)
+      	dist: the maximum number of pixels to search in all directions to find values to interpolate from (int)
+        iters: the number of 3x3 smoothing filter passes to run (int)
+    '''
+
+    # use rasterio fill fillnodata to fill holes in our array
+    inputFilled = fillnodata(arr, mask=fillmask, max_search_distance=dist, smoothing_iterations=iters)
+    inputFilled[pd.isnull(inputFilled) == True] = 0
+    return inputFilled
+
+
 def fillHole(file, dest='output_filled.tif', dist=10, iters=1):
     """
     Fill hole in raster
@@ -235,12 +250,10 @@ def fillHole(file, dest='output_filled.tif', dist=10, iters=1):
         fillmask = inputs.copy() # fillnodata is applied where the mask=0
         fillmask[inputs>=0] = 1
         fillmask[fillmask!=1] = 0
-        
-        inputFilled = fillnodata(inputs, mask=fillmask, max_search_distance=dist, smoothing_iterations=iters)
-        inputFilled[pd.isnull(inputFilled) == True] = 0
+	filledRaster = fillArrayHoles(inputs, mask=fillmask, dist=dist, iters=iters)
 
     with rasterio.open(dest, 'w', **profile) as dst:
-        dst.write_band(1, inputFilled)
+        dst.write_band(1, filledRaster)
 
 
 def mosaic_files(files, mosaic_output):
