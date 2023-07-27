@@ -31,23 +31,24 @@ def add_grf_noise(array, array_res, correlation_length, noise_strength):
     return array_noisy
 
 
-def add_ice_thickness_bias(ice_thickness, relative_distance, comp_factor=3, direction='UV'):
+def add_ice_thickness_bias(ice_thickness, relative_distance, comp_factor=2, direction='UV'):
     """
     Add bias to the ice thickness data based on the relative distance from the glacier center. This assumes bias in ice thickness 
     relative to distance from centerline resulting from inaccurate bed profile assumption during ice thickness inversion
 
     :param ice_thickness: array of ice thickness values. (np array)
     :param relative_distance: array of relative distances from the glacier centerline to edge (np array)
-    :param comp_factor: comparison factor for the V to U-shaped cross-sections. Default of 3 gives max of 20% thickness change. Lower values add greater bias (numeric)
+    :param comp_factor: comparison factor for the V to U-shaped cross-sections. Default of 2 gives max of ~30% thickness change. Lower values add greater bias (numeric)
     :param direction: direction of bias, either 'UV' or 'VU'. 'UV' assumes our modeled ice thickness is a parabola and reality is a V. 'VU' assumes the opposite case (str)
     
     Returns: array of ice thickness values with added bias, and the bias factor
     """
 
     # apply bias based on the relative distance 
-    # we use a 4th order parabolic function, following from the shallow-ice approximation
+    # we use a 2nd order parabolic function, following from the shallow-ice approximation (consistent with OGGM)
     # we use a V-shape function with the same mean as the parabola
-    bias_factor = ((relative_distance ** 4) + (3/5) + comp_factor) / ((8/5) * relative_distance + comp_factor)
+    # bias_factor = ((relative_distance ** 4) + (3/5) + comp_factor) / ((8/5) * relative_distance + comp_factor)
+    bias_factor = ((relative_distance ** 2) + (1/3) + comp_factor) / ((4/3) * relative_distance + comp_factor)
 
     # Add the bias to the ice thickness data
     if direction == 'VU':
@@ -56,6 +57,4 @@ def add_ice_thickness_bias(ice_thickness, relative_distance, comp_factor=3, dire
     ice_thickness_bias = ice_thickness * bias_factor
 
     return ice_thickness_bias, bias_factor
-
-
 
