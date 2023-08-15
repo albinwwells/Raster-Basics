@@ -12,7 +12,7 @@ If you've already downloaded the module, enter `sudo pip install raster_basics -
 
 All of the functions can be imported with:
 
- - `from raster_basics.RasterBasics import show_fig, rasterLike`
+ - `from raster_basics.RasterBasics import show_fig, show_fig_subplots, rasterLike`
  - `from raster_basics.RasterBasics import shpReprojection, shpClip, tifReprojectionResample,fillHole, mosaic_files`
  - `from raster_basics.RasterBasics import extract_along_line,points_along_lines, end_points`
  
