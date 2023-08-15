@@ -22,6 +22,7 @@ Dependencies to run `raster_basics` can be installed manually or via the `requir
 ## Functions
  - `rOpen`: open a geotiff file as an array, and/or get the geotiff resolution and coordinate system
  - `show_fig`: show geotiff as a matplotlib figure
+ - `show_fig_subplots`: shows multiple geotiff or array-like figures
  - `rasterLike`: save array as a raster
  - `shpReprojection`: reproject shapefile
  - `shpBuffer`: add a buffer to shapefile
