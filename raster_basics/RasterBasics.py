@@ -49,7 +49,7 @@ def rOpen(geotiff, band=1, returnArray=True, returnRes=False, returnCrs=False):
 
 """ Simple way to plot raster file """
 
-def show_fig(image, title=None, color='Spectral', ctitle='colorbar title', bounds=None, res=None, vmin=None, vmax=None, savefig=False):
+def show_fig(image, title=None, color='Spectral', ctitle='', bounds=None, res=None, vmin=None, vcenter=None, vmax=None, savefig=False):
     """
     Plotting a raster file
 	image: input array (array-like) (e.g. rasterio.open('raster.tif').read(1))
@@ -59,29 +59,35 @@ def show_fig(image, title=None, color='Spectral', ctitle='colorbar title', bound
 	bounds: raster plot bounds, input: (left, right, bottom, top) (floats) 
 	res: raster pixel resolution (int or float)
 	vmin, vmax: plot minimum and maximum (int or float)
+	vcenter: center of colormap
 	savefig: If true, figure is saved as a .jpg in the current directory with the filename being the title input (boolean)
     """
     fig, ax = plt.subplots(figsize=(12,6))
-    c = ax.imshow(image, cmap=color, extent=bounds, vmin=vmin, vmax=vmax)
+    if vcenter != None:
+    	divnorm = TwoSlopeNorm(vmin=vmin, vcenter=vcenter, vmax=vmax)
+    	c = ax.imshow(image, cmap=color, extent=bounds, norm=divnorm)
+    else:
+    	c = ax.imshow(image, cmap=color, extent=bounds, vmin=vmin, vmax=vmax)
     if res != None:
         ax.add_artist(ScaleBar(dx=res, units='m')) # add scalebar
-	ax.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
+        ax.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
     fig.colorbar(c, label=ctitle)
     fig.suptitle(title)
     plt.show()
     if savefig == True:
-        fig.savefig(title + '.jpg', dpi=1000) # to save the plot as a jpg image
+    	fig.savefig(title + '.jpg', dpi=500) # to save the plot as a jpg image
+
 
 def show_fig_subplot(images, titles=None, colors=None, ctitles=None, bounds=None, res=None, vmins=None, vmaxs=None,
                      suptitle=None, ncols=2, savefig=False):
     """
     Plotting multiple raster files
- 	images: list of input arrays (list of array-like) (e.g. [rasterio.open('raster.tif').read(1), rasterio.open('raster2.tif').read(1)])
+	images: list of input arrays (list of array-like) (e.g. [rasterio.open('raster.tif').read(1), rasterio.open('raster2.tif').read(1)])
 	titles: list of figure titles (list of str) (e.g. ['velocity plot', 'thickness plot'])
 	colors: list of figure colormaps (list of str) (e.g. ['Spectral', 'RdBu'])
 	ctitles: list of colorbar titles (list of str) (e.g. ['m/yr', 'm'])
 	bounds: list of raster plot bounds, input: (list of [left, right, bottom, top]) (list of floats) 
-	res: list of raster pixel resolutions (list of int or float)
+ 	res: list of raster pixel resolutions (list of int or float)
 	vmins, vmaxs: list of plot minimum and maximum (list of int or float)
 	suptitle: title of the plot (str)
 	ncols: number of columns for subplots (int)
@@ -114,10 +120,16 @@ def show_fig_subplot(images, titles=None, colors=None, ctitles=None, bounds=None
             color = colors[index] if colors is not None else 'Spectral'
             ctitle = ctitles[index] if ctitles is not None else ''
             vmin = vmins[index] if vmins is not None else None
+            vcenter = vcenters[index] if vcenters is not None else None
             vmax = vmaxs[index] if vmaxs is not None else None
             bound = bounds[index] if bounds is not None else None
             
-            c = ax.imshow(image, cmap=color, extent=bound, vmin=vmin, vmax=vmax)
+            if vcenter != None:
+                divnorm = TwoSlopeNorm(vmin=vmin, vcenter=vcenter, vmax=vmax)
+                c = ax.imshow(image, cmap=color, extent=bound, norm=divnorm)
+            else:
+                c = ax.imshow(image, cmap=color, extent=bound, vmin=vmin, vmax=vmax)
+            
             if res is not None:
                 if res[index] is not None:
                     ax.add_artist(ScaleBar(dx=res[index], units='m'))
@@ -131,7 +143,6 @@ def show_fig_subplot(images, titles=None, colors=None, ctitles=None, bounds=None
     plt.show()
     if savefig == True:
         fig.savefig(suptitle + '.jpg', dpi=1000) # to save the plot as a jpg image
-
 
 
 """ Geoprocessing tools:
