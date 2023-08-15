@@ -78,7 +78,7 @@ def show_fig(image, title=None, color='Spectral', ctitle='', bounds=None, res=No
     	fig.savefig(title + '.jpg', dpi=500) # to save the plot as a jpg image
 
 
-def show_fig_subplot(images, titles=None, colors=None, ctitles=None, bounds=None, res=None, vmins=None, vmaxs=None,
+def show_fig_subplot(images, titles=None, colors=None, ctitles=None, bounds=None, res=None, vmins=None, vcenters=None, vmaxs=None,
                      suptitle=None, ncols=2, savefig=False):
     """
     Plotting multiple raster files
@@ -88,7 +88,7 @@ def show_fig_subplot(images, titles=None, colors=None, ctitles=None, bounds=None
 	ctitles: list of colorbar titles (list of str) (e.g. ['m/yr', 'm'])
 	bounds: list of raster plot bounds, input: (list of [left, right, bottom, top]) (list of floats) 
  	res: list of raster pixel resolutions (list of int or float)
-	vmins, vmaxs: list of plot minimum and maximum (list of int or float)
+	vmins, vcenters, vmaxs: list of plot minimums, centers, and maximums (list of int or float)
 	suptitle: title of the plot (str)
 	ncols: number of columns for subplots (int)
 	savefig: If true, figure is saved as a .jpg in the current directory with the filename being the suptitle input (boolean)
