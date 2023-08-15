@@ -12,7 +12,7 @@ If you've already downloaded the module, enter `sudo pip install raster_basics -
 
 All of the functions can be imported with:
 
- - `from raster_basics.RasterBasics import show_fig, show_fig_subplots, rasterLike`
+ - `from raster_basics.RasterBasics import show_fig, show_fig_subplot, rasterLike`
  - `from raster_basics.RasterBasics import shpReprojection, shpClip, tifReprojectionResample,fillHole, mosaic_files`
  - `from raster_basics.RasterBasics import extract_along_line,points_along_lines, end_points`
  
@@ -22,7 +22,7 @@ Dependencies to run `raster_basics` can be installed manually or via the `requir
 ## Functions
  - `rOpen`: open a geotiff file as an array, and/or get the geotiff resolution and coordinate system
  - `show_fig`: show geotiff as a matplotlib figure
- - `show_fig_subplots`: shows multiple geotiff or array-like figures
+ - `show_fig_subplot`: shows multiple geotiff or array-like figures
  - `rasterLike`: save array as a raster
  - `shpReprojection`: reproject shapefile
  - `shpBuffer`: add a buffer to shapefile
