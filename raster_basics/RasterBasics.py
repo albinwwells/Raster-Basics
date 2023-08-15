@@ -72,6 +72,67 @@ def show_fig(image, title=None, color='Spectral', ctitle='colorbar title', bound
     if savefig == True:
         fig.savefig(title + '.jpg', dpi=1000) # to save the plot as a jpg image
 
+def show_fig_subplot(images, titles=None, colors=None, ctitles=None, bounds=None, res=None, vmins=None, vmaxs=None,
+                     suptitle=None, ncols=2, savefig=False):
+    """
+    Plotting multiple raster files
+ 	images: list of input arrays (list of array-like) (e.g. [rasterio.open('raster.tif').read(1), rasterio.open('raster2.tif').read(1)])
+	titles: list of figure titles (list of str) (e.g. ['velocity plot', 'thickness plot'])
+	colors: list of figure colormaps (list of str) (e.g. ['Spectral', 'RdBu'])
+	ctitles: list of colorbar titles (list of str) (e.g. ['m/yr', 'm'])
+	bounds: list of raster plot bounds, input: (list of [left, right, bottom, top]) (list of floats) 
+	res: list of raster pixel resolutions (list of int or float)
+	vmins, vmaxs: list of plot minimum and maximum (list of int or float)
+	suptitle: title of the plot (str)
+	ncols: number of columns for subplots (int)
+	savefig: If true, figure is saved as a .jpg in the current directory with the filename being the suptitle input (boolean)
+    """
+    num_images = len(images)
+    
+    # Calculate the number of rows and columns for the subplot grid
+    num_rows = 1 if num_images <= ncols else (num_images + ncols - 1) // ncols
+    num_cols = min(num_images, ncols)
+    
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=(12, 6 * num_rows))
+    if num_images == 1:
+        axes = [[axes]]  # Handle the case with only one image
+    
+    for i in range(num_rows):
+        for j in range(num_cols):
+            if num_rows > 1:
+                ax = axes[i][j]
+            else:
+                ax = axes[j]  # For a single row, access axes directly
+
+            index = i * num_cols + j
+            if index >= num_images:
+                ax.axis('off')  # Hide unused subplots if necessary
+                continue
+            
+            image = images[index]
+            title = titles[index] if titles is not None else None
+            color = colors[index] if colors is not None else 'Spectral'
+            ctitle = ctitles[index] if ctitles is not None else ''
+            vmin = vmins[index] if vmins is not None else None
+            vmax = vmaxs[index] if vmaxs is not None else None
+            bound = bounds[index] if bounds is not None else None
+            
+            c = ax.imshow(image, cmap=color, extent=bound, vmin=vmin, vmax=vmax)
+            if res is not None:
+                if res[index] is not None:
+                    ax.add_artist(ScaleBar(dx=res[index], units='m'))
+                    ax.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
+
+            ax.set_title(title)
+            fig.colorbar(c, ax=ax, label=ctitle)
+    
+    fig.suptitle(suptitle)
+    plt.tight_layout()
+    plt.show()
+    if savefig == True:
+        fig.savefig(suptitle + '.jpg', dpi=1000) # to save the plot as a jpg image
+
+
 
 """ Geoprocessing tools:
 
