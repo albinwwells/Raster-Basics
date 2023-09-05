@@ -1,11 +1,13 @@
 # Glacier functions. Mass balance, area, slope, aspect, hillshade calculations.
 # Also some functions correcting velocities
+import os
 import rasterio
 import rasterio.plot
 import rasterio.mask
 import earthpy.spatial as es
 import numpy as np
 import math
+from tqdm import tqdm
 import matplotlib.pyplot as plt
 from scipy import stats
 from scipy.ndimage import distance_transform_edt
@@ -469,6 +471,70 @@ def stress_vel_plot(dem_slope, thickness, vel, title, slope_threshold=60, showPl
     ax.set_ylim(bottom=0, top=new_vel.max())
     plt.grid()
     plt.show(block=showPlot)
+
+
+def particle_flow(vx_fp, vy_fp, t0_loc, time_steps=range(0,11), num_substep=10000, dist_xy=0.1, xfact=1, yfact=1, verbose=True):
+    '''
+    Takes velocity x- and y- files and a point location. Returns the location of the point after each time step
+        vx_fp, vy_fp: velocity x and y filepaths (str, make sure files are in UTM coordinates)
+        t0_loc: starting point coordiantes in UTM coordinates (tuple)
+        time_steps: time steps for analysis (list or range() of values, same time unit as velocity)
+        num_substep: number of substeps (int, default to 1000)
+        dist_xy: distance to move each substep (int, default 1, meters)
+        xfact, yfact: multiplication factor for vx and vy (for unit conversion or reversal of its_live vx result)
+        verbose: whether to print informational statements (boolean, default to True)
+    '''
+    if verbose:
+        print('Calculating flowpath for', os.path.basename(vx_fp), 'and', os.path.basename(vy_fp), '...')
+    current_x, current_y = t0_loc # stake starting point location
+    err_tot = 0
+
+    point_x_coords = []
+    point_y_coords = []
+    res = rasterio.open(vx_fp).res[0] # raster resolution
+    break_tf = False
+
+    for time_step in tqdm(time_steps):
+        # append the UTM coordinates to lists
+        point_x_coords.append(current_x)
+        point_y_coords.append(current_y)
+        t_step = 0 # start with 0 time each step
+
+        # open the velocity files and extract the velocity values at the current UTM coordinates
+        for i in range(num_substep):
+            try:
+                with rasterio.open(vx_fp) as vx_dataset, rasterio.open(vy_fp) as vy_dataset:
+                    vx_value = list(vx_dataset.sample([(current_x, current_y)], indexes=1))[0][0] * xfact
+                    vy_value = list(vy_dataset.sample([(current_x, current_y)], indexes=1))[0][0] * yfact
+
+                # move dist_xy meters, then updates velocity vals
+                v_value = (vx_value**2 + vy_value**2)**0.5 # velocity magnitude
+                dist_xy = max(v_value * 0.01, 0.05) # set cutoff minimum value of 0.05
+                current_x += (dist_xy * vx_value / v_value) # normalize vx, vy values to desired distance
+                current_y += (dist_xy * vy_value / v_value)
+                t_step += dist_xy/v_value # time taken to move that distance
+
+                assert i != num_substep-1, 'WARNING: NOT ENOUGH "NUM_SUBSTEP" OR TOO SMALL "DIST_XY"'
+                if t_step >= 0.995: # break when time is 1 step (year)
+                    err_step = (t_step - 1) * v_value
+                    err_tot += err_step
+                    break
+            except AssertionError as err:
+                print(err)  # print assertation errors
+                    
+            except:
+                print('\tParticle moved off glacier during time_step', time_step)
+                break_tf = True
+                break
+
+        if break_tf:
+            break
+    
+    if verbose:
+        print('\tTotal uncertainty from cumulating time_step residuals (m):', round(err_tot, 4))
+        print('\tDONE\n')
+    return point_x_coords, point_y_coords
+
 
 def distance_from_line(line_array, res, mask=None):
     '''
