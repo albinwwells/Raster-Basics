@@ -12,12 +12,16 @@ If you've already downloaded the module, enter `sudo pip install raster_basics -
 
 All of the functions can be imported with:
 
- - `from raster_basics.RasterBasics import show_fig, show_fig_subplot, rasterLike`
+ - `from raster_basics.RasterBasics import rOpen, show_fig, show_fig_subplot, rasterLike, rasterMath`
  - `from raster_basics.RasterBasics import shpReprojection, shpClip, tifReprojectionResample,fillHole, mosaic_files`
  - `from raster_basics.RasterBasics import extract_along_line,points_along_lines, end_points`
  
 ### Installing Dependencies
-Dependencies to run `raster_basics` can be installed manually or via the `requirements.txt` file. Download the file, navigate to it's directory in the terminal, and install dependencies by typing `pip install -r requirements.txt` or `conda install --file requirements.txt`. If creating a new conda environment for `raster_basics`, you may also need to `conda install pip` initially. This should install all the dependencies needed to run the `raster_basics` module.
+Dependencies are automatically installed when `raster_basics` in downloaded via PyPI. Dependencies can otherwise be installed via the `requirements.txt` file. Download the file, navigate to it's directory in the terminal, and install dependencies by typing `pip install -r requirements.txt` or `conda install --file requirements.txt`. If creating a new conda environment for `raster_basics`, you may also need to `conda install pip` initially. This should install all the dependencies needed to run the `raster_basics` module.
+
+## Using raster_basics
+The raster_basics module can be used in Jupyter Notebooks or any IDE. Simply import the desired functions to use them. An example of use can be found in the `rasterio_basics-package.ipynb`, `wolverine_index_site_method.ipynb`, and `gulkana_flux_gate_method.ipynb` notebooks.
+
 
 ## Functions
  - `rOpen`: open a geotiff file as an array, and/or get the geotiff resolution and coordinate system
