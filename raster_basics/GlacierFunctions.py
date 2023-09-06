@@ -103,15 +103,21 @@ def flux_div_comps(vx, vy, h, res, vCol=0.8, filt=True, filter_type='Gauss', fil
 #     attr_array = rd.TerrainAttribute(dem_array, attrib=attrFormat)
 #     return attr_array
 
-def glacierSlope(array, res):
+def glacierSlope(array, res, attrFormat='riserun'):
     """
     Rise/run slope of a raster array
 	array: input array (array-like)
 	res: pixel resolution (int or float)
+ 	attrFormat: slope format (str, either 'riserun' or 'degree')
     """
     # alternate way to obtain the riserun slope, with an array input instead of raster
     px, py = np.gradient(array, res)
-    slope = np.sqrt(px ** 2 + py ** 2)
+    if attrFormat == 'riserun':
+        slope = np.sqrt(px ** 2 + py ** 2)
+    elif attrFormat == 'degree':
+        slope = np.degrees(np.arctan2(np.sqrt(px ** 2 + py ** 2), np.ones_like(array)))
+    else:
+        print("Invalid attrFormat input. Please choose either 'riserun' (default) or 'degree'")
     return slope
 
 def demHillshade(demArray, az=135, alt=30):
