@@ -63,7 +63,7 @@ There are a few more functions to help produce specific plots and glacier calcul
   - `totalMassBalance`: get the total mass change on a glacier (pixel by pixel)
   - `totalMassBalanceValue`: get the total mass change on a glacier (area-sum of pixels)
   - `divQ`: get the flux divergence
-  - `glacierSlope`: alternate function to obtain the riserun slope from an array
+  - `glacierSlope`: alternate function to obtain the riserun or degree slope from an array
   - `demHillshade`: create a hillshade from a DEM
   - `velocityAspect`: returns the aspect of velocity based on vx and vy
   - `velAspectAngle`: get the angle between two arrays of velocity aspect
