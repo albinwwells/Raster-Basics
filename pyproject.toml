@@ -1,0 +1,49 @@
+[project]
+name = "raster_basics"
+version = "1.4.3"
+description = "Basic GeoTIFF Processing"
+requires-python = ">=3.6"
+authors = [
+     {name = "Albin Wells", email = "awwells@andrew.cmu.edu"},
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "earthpy",
+    "Fiona",
+    "geopandas",
+    "ipykernel",
+    "jupyter",
+    "matplotlib",
+    "matplotlib_scalebar",
+    "numpy",
+    "pandas",
+    "pyproj",
+    "rasterio",
+    "rioxarray",
+    "scipy",
+    "Shapely",
+    "tqdm",
+    "xarray"
+]
+
+[project.urls]
+documentation = "https://github.com/albinwwells/Raster-Basics/tree/main"
+repository = "https://github.com/albinwwells/Raster-Basics/tree/main"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+
+# navigate to directory
+# python3 -m build
+# python3 -m twine upload dist/*
+# rm -r dist
+
+# sudo pip install raster_basics --upgrade
+
+# to generate requirements.txt: navigate to directory, then:
+# pipreqs raster_basics
+
