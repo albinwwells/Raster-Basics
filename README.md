@@ -17,7 +17,7 @@ All of the functions can be imported with:
  - `from raster_basics.RasterBasics import extract_along_line,points_along_lines, end_points`
  
 ### Installing Dependencies
-Dependencies are automatically installed when `raster_basics` in downloaded via PyPI. Dependencies can otherwise be installed via the `requirements.txt` file. Download the file, navigate to it's directory in the terminal, and install dependencies by typing `pip install -r requirements.txt` or `conda install --file requirements.txt`. If creating a new conda environment for `raster_basics`, you may also need to `conda install pip` initially. This should install all the dependencies needed to run the `raster_basics` module.
+Dependencies are automatically installed when `raster_basics` is downloaded via PyPI. Dependencies can otherwise be installed via the `requirements.txt` file. Download the file, navigate to it's directory in the terminal, and install dependencies by typing `pip install -r requirements.txt` or `conda install --file requirements.txt`. If creating a new conda environment for `raster_basics`, you may also need to `conda install pip` initially. This should install all the dependencies needed to run the `raster_basics` module.
 
 ## Using raster_basics
 The raster_basics module can be used in Jupyter Notebooks or any IDE. Simply import the desired functions to use them. An example of use can be found in the `rasterio_basics-package.ipynb`, `wolverine_index_site_method.ipynb`, and `gulkana_flux_gate_method.ipynb` notebooks.
@@ -41,11 +41,10 @@ The raster_basics module can be used in Jupyter Notebooks or any IDE. Simply imp
  - `end_points`: obtain raster values at point locations
  - `distance_to_shp`: gets the distance from every pixel to a shapefile
 
-## Tutorial
-Follow the Jupyter Notebook `rasterio_basics.ipynb` to see how functions can be used. The notebook `rasterio_basics-package.ipynb` is identical to `rasterio_basics.ipynb` but uses the installed Python Raster_Basics module. Access to the [sample data used in the tutorial can be found here](https://drive.google.com/file/d/1lNiQBo-rNe2_VC6vUCM2gfp-Z-F2Q49c/view?usp=share_link). Run the notebook code in the same folder as the data.
+## Testing and Tutorials
+After installing `raster_basics` into a virtual environment, create a Jupyter Notebook kernel to use the example notebooks. In the terminal, enter `python -m ipykernel install --user --name raster_basics_kernel` (the last entry can be any desired kernel name). Then, launch the Jupyter with `jupyter notebook`. In the browser tab, navigate to `examples` and open the desired notebook.
 
-`wolverine_index_site_method.ipynb` is a notebook that shows an example comparing glaciologic and geodetic mass balance calculations using the `raster-basics` module. This includes an uncertainty estimate of the geodetic mass balance following a Monte Carlo approach.
-
+Follow the Jupyter Notebooks in the `examples` folder to see how functions can be used. Access to the [sample data used in the tutorial can be found here](https://drive.google.com/file/d/1lNiQBo-rNe2_VC6vUCM2gfp-Z-F2Q49c/view?usp=share_link). Run the notebook code in the same folder as the data.
 
 # Other functions in the package
 There are a few more functions to help produce specific plots and glacier calculations. These can be imported with:
