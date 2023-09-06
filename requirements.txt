@@ -1,0 +1,16 @@
+earthpy
+Fiona
+geopandas
+ipykernel
+jupyter
+matplotlib
+matplotlib_scalebar
+numpy
+pandas
+pyproj
+rasterio
+rioxarray
+scipy
+Shapely
+tqdm
+xarray
