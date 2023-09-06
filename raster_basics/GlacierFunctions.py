@@ -105,7 +105,7 @@ def flux_div_comps(vx, vy, h, res, vCol=0.8, filt=True, filter_type='Gauss', fil
 
 def glacierSlope(array, res, attrFormat='riserun'):
     """
-    Rise/run slope of a raster array
+    Rise/run or degree slope of a raster array
 	array: input array (array-like)
 	res: pixel resolution (int or float)
  	attrFormat: slope format (str, either 'riserun' or 'degree')
