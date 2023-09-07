@@ -94,7 +94,6 @@ def binPercentile(calcFile, dem, outline, lower_percentile, bin_z=None):
     # binNumber = demBinPercentile_low[2]
     return binStat_low, binStat_high
 
-
 def latlonTiffIndex(geotiff, coordinates, crs):
     """
 	obtain raster array index values at a lat / lon coordinate location
@@ -103,12 +102,37 @@ def latlonTiffIndex(geotiff, coordinates, crs):
 	 	coordinates: coordinates at which to sample the raster (tuple)
 		crs: coordiante system of the coordinates (str) (e.g. 'EPSG:4326')
     """
-    geo_array = rasterio.open(geotiff)
-    transformer = pyproj.Transformer.from_crs(pyproj.CRS('EPSG:4326'), pyproj.CRS(crs))
-    east, north = transformer.transform(coordinates[0], coordinates[1])         # find utm coordinates from lat/lon
-    row, col = geo_array.index(east, north)                 # obtain raster row/col closest to utm coordinates
-    return row, col
+    # open the GeoTIFF file
+    with rasterio.open(geotiff) as src:
+        # create an array to hold the raster data
+        geo_array = src.read(1)
 
+        # check if the CRS of the GeoTIFF matches the specified CRS
+        if src.crs != crs:
+            raise ValueError("CRS mismatch between GeoTIFF and specified CRS.")
+
+        # Initialize lists to store row and column indices
+        row_indices = []
+        col_indices = []
+
+        # loop through the coordinates
+        for lat, lon in coordinates:
+            # check for NaN values in the coordinates
+            if np.isnan(lat) or np.isnan(lon):
+                print(f"Skipping NaN coordinate: ({lat}, {lon})")
+                continue
+
+            # transform the latitude and longitude to UTM
+            transformer = pyproj.Transformer.from_crs(pyproj.CRS('EPSG:4326'), pyproj.CRS(crs))
+            east, north = transformer.transform(lat, lon)         # find utm coordinates from lat/lon
+
+            # get the row and column indices for the UTM coordinate
+            row, col = src.index(east, north)
+
+            # append the indices to the lists
+            row_indices.append(row)
+            col_indices.append(col)
+        return row_indices, col_indices
 
 
 ## -------- THESE ARE A WORK IN PROGRESS / ABANDONED ---------
