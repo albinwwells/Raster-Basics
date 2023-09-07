@@ -240,7 +240,7 @@ def tifReprojectionResample(file, reprojected_tif, crs, res, interp, extent_file
 	res: target raster resolution (int or float)
 	interp: resampling interpolation method (Resampling method from rasterio.warp module)  (e.g. rasterio.warp.Resampling.cubic_spline)
 	extent_file: raster file to match extent (str)    
- 	fill_val: value to fill nan, in the event that reprojection produced nan values (numeric)
+ 	fill_val: nodata value to fill all areas not covered by the reprojected source (numeric)
     """
 
     if extent_file != None:
@@ -278,19 +278,15 @@ def tifReprojectionResample(file, reprojected_tif, crs, res, interp, extent_file
             'height': height
         })
 
-        if fill_val != None:
-            src_array = src.read(1)
-            src_array[np.isnan(src_array)] = fill_val
-        else:
-            src_array = rasterio.band(src, 1)
         with rasterio.open(reprojected_tif, 'w', **kwargs) as dst:
             reproject(
-                source=src_array,
+                source=rasterio.band(src, 1),
                 destination=rasterio.band(dst, 1),
                 src_transform=src.transform,
                 src_crs=src.crs,
                 dst_transform=transform,
                 dst_crs=crs,
+                dst_nodata=fill_val,
                 resampling=interp   # Resampling.cubic_spline
             )
             
