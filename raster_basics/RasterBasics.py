@@ -231,7 +231,7 @@ def shpClip(geotiff, shapefile, destination, nan_val=0, fill=True, pad_size=0, c
         os.remove(f)
 
 
-def tifReprojectionResample(file, reprojected_tif, crs, res, interp, extent_file=None):
+def tifReprojectionResample(file, reprojected_tif, crs, res, interp, extent_file=None, fill_val=None):
     """
     Reproject, resample, and/or clip raster extent
 	file: input raster to resample, reproject, and/or clip (str) (e.g. 'input.tif')
@@ -240,6 +240,7 @@ def tifReprojectionResample(file, reprojected_tif, crs, res, interp, extent_file
 	res: target raster resolution (int or float)
 	interp: resampling interpolation method (Resampling method from rasterio.warp module)  (e.g. rasterio.warp.Resampling.cubic_spline)
 	extent_file: raster file to match extent (str)    
+ 	fill_val: value to fill nan, in the event that reprojection produced nan values (numeric)
     """
 
     if extent_file != None:
@@ -277,9 +278,14 @@ def tifReprojectionResample(file, reprojected_tif, crs, res, interp, extent_file
             'height': height
         })
 
+        if fill_val != None:
+            src_array = src.read(1)
+            src_array[np.isnan(src_array)] = fill_val
+	else:
+            src_array = rasterio.band(src, 1)
         with rasterio.open(reprojected_tif, 'w', **kwargs) as dst:
             reproject(
-                source=rasterio.band(src, 1),
+                source=src_array,
                 destination=rasterio.band(dst, 1),
                 src_transform=src.transform,
                 src_crs=src.crs,
