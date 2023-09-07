@@ -85,6 +85,7 @@ There are a few more functions to help produce specific plots and glacier calcul
   - `elevationBinPlot`: plots two sets of data: line plot for MB and horizontal bar graph for elevation bin size
   - `elevationBinPlot3Subfigs`: plots `elevationBinPlot` along with 3 more subplots from desired input arrays
   - `plotDataPoints`: plots labeled data points on top of an array basemap. This is used to plot stake locations, for example
+  - `plotDataPoints2`: identical to `plotDataPoints`, but plots two maps side-by-side
   - `velPlot`: this does no actually plot anything. Rather, it returns the quiver input needed to plot velocity arrows in other functions such as `plotData`
   - `plotClassify`: plot array with discrete values
   - `plotContinuous`: plot array with continuous values
