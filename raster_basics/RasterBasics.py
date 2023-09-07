@@ -281,7 +281,7 @@ def tifReprojectionResample(file, reprojected_tif, crs, res, interp, extent_file
         if fill_val != None:
             src_array = src.read(1)
             src_array[np.isnan(src_array)] = fill_val
-	else:
+        else:
             src_array = rasterio.band(src, 1)
         with rasterio.open(reprojected_tif, 'w', **kwargs) as dst:
             reproject(
