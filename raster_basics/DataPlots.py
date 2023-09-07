@@ -33,17 +33,19 @@ def show_fig(image, title=None, color='Spectral', ctitle='', bounds=None, res=No
     if savefig == True:
     	fig.savefig(title + '.jpg', dpi=500) # to save the plot as a jpg image
 
-def scatterplot(data, xtitle, ytitle, title, colors, labels, markers='.', alpha=0.7, xyLine=False, buff=100, savefig=False):
+def scatterplot(data, xtitle, ytitle, title, colors, labels, markers='.', alpha=0.7, xyLine=False, 
+                xbuff=1, ybuff=100, leg_loc='best', anchor=None, savefig=False):
     """
-	Create a scatterplot from data
-		data: input data (list of arrays of length 2) (e.g. [[0, 0, 0, 0], [1, 2, 3, 4]] or [[[0, 0, 0], [1, 2, 3]], [[1, 1, 1, 1], [1, 2, 3, 4]]])
-		xtitle, ytitle: axis titles (str)
-		colors: list of colors for each x-y scatterplot dataset (list of str, same length as data)
-		labels: legend label for data (list of str, same length as data) (e.g. ['label1', 'label2'])
-		markers: scatterplot marker (list of str, same length as data, or string if all markers should be the same)
-  		alpha: marker alpha value; transparency (float ranging 0 to 1)
-		xyLine: to show the 1-to-1 line (boolean)
-		buff: buffer on axis limits (int or float)
+    Create a scatterplot from data
+        data: input data (list of arrays of length 2)
+        xtitle, ytitle: axis titles (str)
+        colors: list of colors for each x-y scatterplot dataset (list of str, same length as data)
+        labels: legend label for data (list of str, same length as data) (e.g. ['label1', 'label2'])
+        markers: scatterplot marker (list of str, same length as data, or string if all markers should be the same)
+        alpha: marker alpha value; transparency (float ranging 0 to 1)
+        xyLine: to show the 1-to-1 line (boolean)
+        leg_loc: location of the legend (str; upper lower center left right middle)
+        buff: buffer on axis limits (int or float)
     """
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -56,25 +58,25 @@ def scatterplot(data, xtitle, ytitle, title, colors, labels, markers='.', alpha=
         ax.scatter(xy[0], xy[1], c=colors[i], alpha=alpha, marker=markers[i], label=labels[i])
     ax.set_xlabel(xtitle)
     ax.set_ylabel(ytitle)
-    ax.legend()
+    ax.legend(loc=leg_loc, bbox_to_anchor=anchor)
     if xyLine == True:
         ax.axline([0, 0], [1, 1], c='k', ls='--', lw=1)
 
     maximums_x, minimums_x, maximums_y, minimums_y = [], [], [], []
-    for d in np.array(data):
+    for d in np.array(data, dtype=object):
         maximums_x.append(np.nanmax(d[0]))
         minimums_x.append(np.nanmin(d[0]))
         maximums_y.append(np.nanmax(d[1]))
         minimums_y.append(np.nanmin(d[1]))
 
-    ax.set_xlim([min(minimums_x) - buff, max(maximums_x) + buff])
-    ax.set_ylim([min(minimums_y) - buff, max(maximums_y) + buff])
-    fig.suptitle(title, size=8)
+    ax.set_xlim([min(minimums_x) - xbuff, max(maximums_x) + xbuff])
+    ax.set_ylim([min(minimums_y) - ybuff, max(maximums_y) + ybuff])
+    fig.suptitle(title, size=12)
     
     if savefig == True:
-    	figName = title.replace(' ', '_') + '.png'
-    	fig.savefig(figName, dpi=250)
-
+        figName = title.replace(' ', '_') + '.png'
+        fig.savefig(figName, dpi=250)
+    return fig, ax
 
 def plotMany(cbarTitle, color, plotTitle, *kwargs):
     """
