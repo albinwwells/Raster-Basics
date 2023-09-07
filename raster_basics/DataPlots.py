@@ -558,8 +558,25 @@ def plotData6(dataVals1, cbarTitle1, color1, title1, dataVals2, cbarTitle2, colo
     else:
     	plt.show()
 
-def plotDataPoints(dataVals1, cbarTitle1, color1, dataVals2, cbarTitle2, color2,
-                   plotTitle, pointx, pointy, pointlabels, savefig=False):
+def plotDataPoints(dataVals, cbarTitle, color, plotTitle, pointx, pointy, pointlabels):
+    # Plot a data array with annotated points
+    fig = plt.figure(figsize=(10, 6))
+    ax = fig.add_subplot(111)
+
+    dataVals = dataVals.astype(float)
+    dataVals[dataVals == 0] = np.nan            # to remove 0 values for white background in plot
+    im = ax.imshow(dataVals, cmap=plt.cm.get_cmap(color))  # check len datavals
+    fig.colorbar(im, label=cbarTitle)
+    ax.scatter(pointx, pointy, s=6, c='Red', marker='o')        # add points where reference data exists
+    for i, txt in enumerate(pointlabels):                       # add labels to each point
+        ax.annotate(text=txt, xy=(pointx[i]+3, pointy[i]-3), c='Red', size=18)
+
+    fig.suptitle(plotTitle, ha='left')
+    fig.tight_layout(pad=3, w_pad=0.0, h_pad=3.0)
+    plt.show()
+
+def plotDataPoints2(dataVals1, cbarTitle1, color1, dataVals2, cbarTitle2, color2,
+                    plotTitle, pointx, pointy, pointlabels, savefig=False):
     '''
     Plots a map from input values (array-like) with labelled point locations from reference data
     Plots 2 side by side maps: identical but with difference basemaps (e.g. elevation and pixel mass balance)
