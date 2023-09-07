@@ -39,7 +39,7 @@ def altitudeAggregation(calcFile, dem, outline, stat, bin_z=50):
     demGlacierArray = demGlacier[~np.isnan(demGlacier)]
     demGlacier_findMin = demGlacier[demGlacier != 0]
     if str(bin_z).isnumeric() == True:
-        z_bin_range = range(int(demGlacier_findMin.min()), int(demGlacier_findMin.max() + bin_z), bin_z)
+        z_bin_range = range(int(np.nanmin(demGlacier_findMin)), int(np.nanmin(demGlacier_findMin) + bin_z), bin_z)
     else:
         z_bin_range = bin_z
 
