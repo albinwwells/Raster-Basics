@@ -1,15 +1,19 @@
 import numpy as np
 
 
-def add_grf_noise(array, array_res, correlation_length, noise_strength):
+def add_grf_noise(array, array_res, correlation_length, noise_strength, mask_val='nan'):
     '''
     Returns the array with spatially-correlated noise added from a Gaussian Random Field
     :param array: np array that we want to add noise to (2D np.array)
     :param array_res: array resolution (numeric, represents meters)
     :param correlation_length: length of spatial correlation in noise (numeric, represents meters)
     :param noise_strength: magnitude of noise. This is multiplied by a GRF with zero mean and unit variance (numeric)
+    :param mask_val: off-glacier value to mask. By default, function masks np.nan. Otherwise, this should be numeric
     '''
-    mask = np.isnan(array) # off-glacier mask (nan values)
+    if mask_val == 'nan':
+        mask = np.isnan(array) # off-glacier mask (nan values)
+    else:
+        mask = np.equal(array, mask_val) # off-glacier mask *(number; e.g. 0)
     correlation_length_eff = correlation_length / array_res # effective correlation length (pixel length)
     
     # --- Generate the Gaussian Random Field ---
