@@ -415,13 +415,13 @@ def rasterMath(geotiff1, geotiff2, eqn='-', interp=Resampling.cubic_spline, outf
 """ Extra functions for sampling along lines """
 
 
-def extract_along_line(xarr, line, n_samples=512):
+def extract_along_line(xarr, line, n_samples=512, method='nearest):
     # samples line with n_samples number of points
     profile = []
     dist = []
     for i in range(n_samples):
         point = line.interpolate(i / n_samples - 1., normalized=True) # get next point on the line
-        value = xarr.sel(x=point.x, y=point.y, method="nearest").data # access the nearest pixel in the xarray
+        value = xarr.sel(x=point.x, y=point.y, method=method).data # access the nearest pixel in the xarray
         profile.append(value)
         dist.append([point.x, point.y])
     return profile, dist
@@ -450,11 +450,11 @@ def points_along_lines(geotiff, line, ID='SEGMENT_ID'):
     return vals, line_dists, dist, ids.to_numpy()
 
 
-def end_points(xarr, points):
+def end_points(xarr, points, method='nearest'):
     # obtains raster values at our point selections themselves (not interpolated lines)
     point_spot = []
     for p in points:
-        point = xarr.sel(x=p[0], y=p[1], method="nearest").data # access the nearest pixel in the xarray
+        point = xarr.sel(x=p[0], y=p[1], method=method).data # access the nearest pixel in the xarray
         point_spot.append(point)
     return point_spot
 
