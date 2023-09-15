@@ -308,7 +308,7 @@ def fillArrayHoles(arr, fillmask, dist=10, iters=1):
     return inputFilled
 
 
-def fillHole(file, dest='output_filled.tif', dist=10, iters=1):
+def fillHole(file, dest='output_filled.tif', dist=10, iters=1, mask=None):
     """
     Fill hole in raster
 	file: input raster to fill (str) (e.g. 'input.tif')
@@ -319,8 +319,11 @@ def fillHole(file, dest='output_filled.tif', dist=10, iters=1):
     with rasterio.open(file) as src:
         profile = src.profile
         inputs = src.read(1)
-        
-        fillmask = inputs.copy() # fillnodata is applied where the mask=0
+
+	if mask == None:
+            fillmask = inputs.copy() # fillnodata is applied where the mask=0
+	else:
+	    fillmask = mask.copy()
         fillmask[inputs>=0] = 1
         fillmask[fillmask!=1] = 0
         filledRaster = fillArrayHoles(inputs, fillmask=fillmask, dist=dist, iters=iters)
