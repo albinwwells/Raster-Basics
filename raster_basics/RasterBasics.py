@@ -323,7 +323,7 @@ def fillHole(file, dest='output_filled.tif', dist=10, iters=1):
         fillmask = inputs.copy() # fillnodata is applied where the mask=0
         fillmask[inputs>=0] = 1
         fillmask[fillmask!=1] = 0
-        filledRaster = fillArrayHoles(inputs, mask=fillmask, dist=dist, iters=iters)
+        filledRaster = fillArrayHoles(inputs, fillmask=fillmask, dist=dist, iters=iters)
 
     with rasterio.open(dest, 'w', **profile) as dst:
         dst.write_band(1, filledRaster)
