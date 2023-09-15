@@ -183,11 +183,11 @@ def shpBuffer(shapefile, dist=100, dst='buffered_shape.shp'):
         return None
 
     # Create a buffer
-    buffered_data = shape.buffer(dist)
+    buffered_data = shape['geometry'].buffer(dist)
 
     # Create a new GeoDataFrame with the buffered data
     buffered_gdf = gpd.GeoDataFrame(geometry=buffered_data, crs=shape.crs)
-    buffered_gdf.to_file(dst) # save the buffered shapefile
+    buffered_data.to_file(dst) # save the buffered shapefile
 
 
 def shpClip(geotiff, shapefile, destination, nan_val=0, fill=True, pad_size=0, crop=True):
