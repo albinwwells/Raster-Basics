@@ -231,7 +231,7 @@ def shpClip(geotiff, shapefile, destination, nan_val=0, fill=True, pad_size=0, c
         os.remove(f)
 
 
-def tifReprojectionResample(file, reprojected_tif, crs, res, interp, extent_file=None, fill_val=None):
+def tifReprojectionResample(file, reprojected_tif, crs, res, interp=Resampling.cubic_spline, extent_file=None, fill_val=None):
     """
     Reproject, resample, and/or clip raster extent
 	file: input raster to resample, reproject, and/or clip (str) (e.g. 'input.tif')
