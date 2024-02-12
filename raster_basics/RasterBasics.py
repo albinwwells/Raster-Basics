@@ -136,7 +136,7 @@ def show_fig_subplot(images, titles=None, colors=None, ctitles=None, bounds=None
                     ax.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
 
             ax.set_title(title)
-            fig.colorbar(c, ax=ax, label=ctitle)
+            fig.colorbar(c, ax=ax, label=ctitle, aspect=4*ax.get_aspect())
     
     fig.suptitle(suptitle)
     plt.tight_layout()
