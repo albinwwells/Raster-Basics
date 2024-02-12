@@ -94,12 +94,13 @@ def show_fig_subplot(images, titles=None, colors=None, ctitles=None, bounds=None
 	savefig: If true, figure is saved as a .jpg in the current directory with the filename being the suptitle input (boolean)
     """
     num_images = len(images)
+    imshape_ratio = images[0].shape[0]/images[0].shape[1]
     
     # Calculate the number of rows and columns for the subplot grid
     num_rows = 1 if num_images <= ncols else (num_images + ncols - 1) // ncols
     num_cols = min(num_images, ncols)
     
-    fig, axes = plt.subplots(num_rows, num_cols, figsize=(12, 6 * num_rows))
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=(10*num_cols, 10*imshape_ratio*num_rows))
     if num_images == 1:
         axes = [[axes]]  # Handle the case with only one image
     
