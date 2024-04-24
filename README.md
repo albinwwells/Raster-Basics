@@ -44,7 +44,7 @@ The raster_basics module can be used in Jupyter Notebooks or any IDE. Simply imp
 ## Testing and Tutorials
 After installing `raster_basics` into a virtual environment, create a Jupyter Notebook kernel to use the example notebooks. In the terminal, enter `python -m ipykernel install --user --name raster_basics_kernel` (the last entry can be any desired kernel name). Then, launch the Jupyter with `jupyter notebook`. In the browser tab, navigate to `examples` and open the desired notebook.
 
-Follow the Jupyter Notebooks in the `examples` folder to see how functions can be used. Access to the [sample data used in the tutorial can be found here](https://drive.google.com/file/d/1lNiQBo-rNe2_VC6vUCM2gfp-Z-F2Q49c/view?usp=share_link). Run the notebook code in the same folder as the data.
+Follow the Jupyter Notebooks in the `examples` folder to see how functions can be used. Access to the sample data used in the tutorial can be found by following the links in the notebooks. Run the notebook code in the same folder as the data.
 
 # Other functions in the package
 There are a few more functions to help produce specific plots and glacier calculations. These can be imported with:
