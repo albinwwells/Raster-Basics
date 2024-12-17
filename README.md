@@ -32,6 +32,7 @@ The raster_basics module can be used in Jupyter Notebooks or any IDE. Simply imp
  - `shpBuffer`: add a buffer to shapefile
  - `shpClip`: clip geotiff by a shapefile
  - `tifReprojectionResample`: reproject, resample, and/or clip geotiff
+ - `reproject_velocity`: reproject velocity data
  - `rasterMath`: perform basic arithmetic on two raster files (even if they have difference crs, res, and/or extents)
  - `fillHole`: fill missing data in geotiff
  - `fillArrayHole`: helper function for `fillHole`, but works directly with arrays
