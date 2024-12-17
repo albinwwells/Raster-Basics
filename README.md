@@ -20,7 +20,7 @@ All of the functions can be imported with:
 Dependencies are automatically installed when `raster_basics` is downloaded via PyPI. Dependencies can otherwise be installed via the `requirements.txt` file. Download the file, navigate to it's directory in the terminal, and install dependencies by typing `pip install -r requirements.txt` or `conda install --file requirements.txt`. If creating a new conda environment for `raster_basics`, you may also need to `conda install pip` initially. This should install all the dependencies needed to run the `raster_basics` module.
 
 ## Using raster_basics
-The raster_basics module can be used in Jupyter Notebooks or any IDE. Simply import the desired functions to use them. An example of use can be found in the `rasterio_basics-package.ipynb`, `wolverine_index_site_method.ipynb`, and `gulkana_flux_gate_method.ipynb` notebooks.
+The raster_basics module can be used in Jupyter Notebooks or any IDE. Simply import the desired functions to use them. An example of use can be found in the `rasterio_basics-package.ipynb`, `velocity_reprojection.ipynb`, `wolverine_index_site_method.ipynb`, and `gulkana_flux_gate_method.ipynb` notebooks.
 
 
 ## Functions
