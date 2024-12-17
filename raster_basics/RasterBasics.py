@@ -502,7 +502,7 @@ def distance_to_shp(geotiff, gpd_shapefile, common_crs='EPSG:32606'):
     return distances_array
 
 
-def reproject_velocity(vx_fp, vy_fp, epsg_from, epsg_to, output_vx_fp, output_vy_fp, apply_correction=False, plot_changes=False, **kwargs):
+def reproject_velocity(vx_fp, vy_fp, from_epsg, to_epsg, output_vx_fp, output_vy_fp, apply_correction=False, plot_changes=False, **kwargs):
     '''
     Reproject velocity:
         1. Extract velocity data from geotiff
@@ -514,7 +514,7 @@ def reproject_velocity(vx_fp, vy_fp, epsg_from, epsg_to, output_vx_fp, output_vy
 
     Arguments:
         vx_fp, vy_fp: Input velocity vectors
-        epsg_from, epsg_to: Initial and target coordinate systems (e.g., 'EPSG:32606')
+        from_epsg, to_epsg: Initial and target coordinate systems in EPSG number (e.g., 32606)
         output_vx_fp, output_vy_fp: Output filepaths
         apply_correction: whether to apply a correction that matches velocity magnitude with the direct reprojection (default: False)
         plot_changes: show plot of reprojection (default: False)
@@ -522,8 +522,8 @@ def reproject_velocity(vx_fp, vy_fp, epsg_from, epsg_to, output_vx_fp, output_vy
     '''
         
     # ----------------  1. extract velocity data from existing geotiff ---------------- 
-    proj_from = CRS.from_epsg(int(epsg_from.split(":")[1]))
-    proj_to = CRS.from_epsg(int(epsg_to.split(":")[1]))
+    proj_from = CRS.from_user_input(from_epsg)
+    proj_to = CRS.from_user_input(to_epsg)
     with rasterio.open(vx_fp) as vx_src, rasterio.open(vy_fp) as vy_src:
         vx_data = vx_src.read(1)  # Read the vx component
         vy_data = vy_src.read(1)  # Read the vy component
@@ -542,7 +542,7 @@ def reproject_velocity(vx_fp, vy_fp, epsg_from, epsg_to, output_vx_fp, output_vy
     endpoints_from = np.column_stack((points_from[:,0] + vx_data.flatten(), points_from[:,1] + vy_data.flatten()))
 
     # ---------------- 3. reproject start and end points ---------------- 
-    transformer = Transformer.from_crs(epsg_from, epsg_to, always_xy=True)
+    transformer = Transformer.from_crs(proj_from, proj_to, always_xy=True)
     points_to = np.array([transformer.transform(x, y) for x, y in points_from])
     endpoints_to = np.array([transformer.transform(x, y) for x, y in endpoints_from])
 
@@ -553,7 +553,7 @@ def reproject_velocity(vx_fp, vy_fp, epsg_from, epsg_to, output_vx_fp, output_vy
     mask = ~((np.isnan(dx) | (dx == 0)) & (np.isnan(dy) | (dy == 0))) # mask off-glacier
     
     # ---------------- 4. rasterize points ----------------     
-    transform_to, width, height = calculate_default_transform(epsg_from, epsg_to, vx_data.shape[1], vx_data.shape[0],
+    transform_to, width, height = calculate_default_transform(proj_from, proj_to, vx_data.shape[1], vx_data.shape[0],
                                                               *rasterio.open(vx_fp).bounds, resolution=rasterio.open(vx_fp).res[0])
 
     pixel_size_x, pixel_size_y = v_res[0], v_res[1]
@@ -612,8 +612,8 @@ def reproject_velocity(vx_fp, vy_fp, epsg_from, epsg_to, output_vx_fp, output_vy
     if apply_correction:
         assert np.abs(pixel_size_x-pixel_size_y) < 0.1, f'Pixels are not square: ({pixel_size_x:.2f}, {pixel_size_y:.2f})'
         # straight reprojection of velocity data
-        tifReprojectionResample(vx_fp, 'temp_vx.tif', epsg_to, pixel_size_x, Resampling.cubic_spline) # reproject
-        tifReprojectionResample(vy_fp, 'temp_vy.tif', epsg_to, pixel_size_x, Resampling.cubic_spline)
+        tifReprojectionResample(vx_fp, 'temp_vx.tif', proj_to, pixel_size_x, Resampling.cubic_spline) # reproject
+        tifReprojectionResample(vy_fp, 'temp_vy.tif', proj_to, pixel_size_x, Resampling.cubic_spline)
         vx_arr_tmp = rasterio.open('temp_vx.tif').read(1)
         vy_arr_tmp = rasterio.open('temp_vy.tif').read(1)
         vx_arr_tmp[(np.abs(vx_arr_tmp) >= 1e10) | np.isnan(vx_arr_tmp)] = 0
@@ -642,6 +642,8 @@ def reproject_velocity(vx_fp, vy_fp, epsg_from, epsg_to, output_vx_fp, output_vy
                       base_arr_vmin=base_arr_vmin, base_arr_vcenter=base_arr_vcenter, base_arr_vmax=base_arr_vmax)
         
         os.remove('tmp_vv_plt.tif')
+
+
 
 
 def quiv_plot(q1, q2, q3, q4, q5, q6, base_tiff=None, **kwargs):
