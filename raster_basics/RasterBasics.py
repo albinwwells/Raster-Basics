@@ -7,6 +7,7 @@ from rasterio.merge import merge
 from rasterio.windows import from_bounds
 from rasterio.fill import fillnodata
 from rasterio.transform import from_bounds
+from rasterio.features import rasterize
 
 import rioxarray
 import xarray
@@ -331,10 +332,10 @@ def fillHole(file, dest='output_filled.tif', dist=10, iters=1, mask=None):
 
         if mask == None:
             fillmask = inputs.copy() # fillnodata is applied where the mask=0
-	    fillmask[inputs>=0] = 1
+            fillmask[inputs>=0] = 1
             fillmask[fillmask!=1] = 0
         else:
-	    fillmask = mask.copy()
+            fillmask = mask.copy()
 
         filledRaster = fillArrayHoles(inputs, fillmask=fillmask, dist=dist, iters=iters)
 
@@ -428,7 +429,7 @@ def rasterMath(geotiff1, geotiff2, eqn='-', interp=Resampling.cubic_spline, outf
 """ Extra functions for sampling along lines """
 
 
-def extract_along_line(xarr, line, n_samples=512, method='nearest):
+def extract_along_line(xarr, line, n_samples=512, method='nearest'):
     # samples line with n_samples number of points
     profile = []
     dist = []

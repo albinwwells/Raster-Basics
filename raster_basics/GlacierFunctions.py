@@ -307,7 +307,7 @@ def velocityAspect(vel_x, vel_y):
                 pixel_aspect = abs(pixel_deg) + 90
             elif pixel_deg > 90:
                 pixel_aspect = 450 - pixel_deg
-	    elif math.isnan(pixel_deg) == True:
+            elif math.isnan(pixel_deg) == True:
                 pixel_aspect = math.nan
             vel_aspect[i][j] = pixel_aspect
     return vel_aspect
