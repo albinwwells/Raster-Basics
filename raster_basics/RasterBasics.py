@@ -6,6 +6,7 @@ from rasterio.warp import calculate_default_transform, reproject, Resampling
 from rasterio.merge import merge
 from rasterio.windows import from_bounds
 from rasterio.fill import fillnodata
+from rasterio.transform import from_bounds
 
 import rioxarray
 import xarray
@@ -13,13 +14,20 @@ import xarray
 import glob, os, warnings
 import numpy as np
 import math
+
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib_scalebar.scalebar import ScaleBar
 from matplotlib import cm
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from matplotlib.colors import TwoSlopeNorm
+
 import fiona
 import shapely.geometry
+from shapely.geometry import Point
 import geopandas as gpd
 import pandas as pd
+from pyproj import Transformer, CRS
 
 
 """ Simple open a raster file """
@@ -493,4 +501,189 @@ def distance_to_shp(geotiff, gpd_shapefile, common_crs='EPSG:32606'):
     return distances_array
 
 
+def reproject_velocity(vx_fp, vy_fp, epsg_from, epsg_to, output_vx_fp, output_vy_fp, apply_correction=False, plot_changes=False, **kwargs):
+    '''
+    Reproject velocity:
+        1. Extract velocity data from geotiff
+        2. Convert geotiff to points: get start and end point of velocity vector
+        3. Reproject start and end points to new coordinate system
+        4. Rasterize reprojected points in new coordinate system
+        5. OPTIONAL: apply_correction: Adjust velocity vectors based on magnitude of a direct reprojection
+        6. OPTIONAL: plot_changes: Plot velocity vector reproject (contains optional arguments for plotting)
+
+    Arguments:
+        vx_fp, vy_fp: Input velocity vectors
+        epsg_from, epsg_to: Initial and target coordinate systems (e.g., 'EPSG:32606')
+        output_vx_fp, output_vy_fp: Output filepaths
+        apply_correction: whether to apply a correction that matches velocity magnitude with the direct reprojection (default: False)
+        plot_changes: show plot of reprojection (default: False)
+        **kwargs: Optional arguments passed along for plotting (quiv_scale, quiv_width, title, ctitle, base_arr_color, vmin, vcenter, vmax) 
+    '''
+        
+    # ----------------  1. extract velocity data from existing geotiff ---------------- 
+    proj_from = CRS.from_epsg(int(epsg_from.split(":")[1]))
+    proj_to = CRS.from_epsg(int(epsg_to.split(":")[1]))
+    with rasterio.open(vx_fp) as vx_src, rasterio.open(vy_fp) as vy_src:
+        vx_data = vx_src.read(1)  # Read the vx component
+        vy_data = vy_src.read(1)  # Read the vy component
+        v_res = vx_src.res
+        transform_from = vx_src.transform  # Get the affine transform of the original raster
+        
+    # ---------------- 2. convert geotiff values to points ---------------- 
+    rows, cols = np.indices(vx_data.shape)
+    lon, lat = rasterio.transform.xy(transform_from, rows, cols)
+    points_from = np.column_stack((np.array(lon).flatten(), np.array(lat).flatten()))
+
+    # calculate the velocity endpoints
+    vx_data[np.abs(vx_data) > 1e30] = 0 # remove NaN values
+    vy_data[np.abs(vy_data) > 1e30] = 0
+    vv_data = (vx_data**2 + vy_data**2)**0.5
+    endpoints_from = np.column_stack((points_from[:,0] + vx_data.flatten(), points_from[:,1] + vy_data.flatten()))
+
+    # ---------------- 3. reproject start and end points ---------------- 
+    transformer = Transformer.from_crs(epsg_from, epsg_to, always_xy=True)
+    points_to = np.array([transformer.transform(x, y) for x, y in points_from])
+    endpoints_to = np.array([transformer.transform(x, y) for x, y in endpoints_from])
+
+    # recalculate the velocity magnitude and components
+    dx = endpoints_to[:,0] - points_to[:,0]  # reprojected vx
+    dy = endpoints_to[:,1] - points_to[:,1]  # reprojected vy
+    angles = np.arctan2(dy, dx)
+    mask = ~((np.isnan(dx) | (dx == 0)) & (np.isnan(dy) | (dy == 0))) # mask off-glacier
+    
+    # ---------------- 4. rasterize points ----------------     
+    transform_to, width, height = calculate_default_transform(epsg_from, epsg_to, vx_data.shape[1], vx_data.shape[0],
+                                                              *rasterio.open(vx_fp).bounds, resolution=rasterio.open(vx_fp).res[0])
+
+    pixel_size_x, pixel_size_y = v_res[0], v_res[1]
+    x_min, x_max = min(points_to[:,0])-(pixel_size_x/2), max(points_to[:,0])+(pixel_size_x/2)
+    y_min, y_max = min(points_to[:,1])-(pixel_size_y/2), max(points_to[:,1])+(pixel_size_y/2)
+    
+    # raster dimensions
+    width = int((x_max - x_min) / pixel_size_x) + 1
+    height = int((y_max - y_min) / pixel_size_y) + 1
+
+    # define affine transform
+    transform = from_bounds(x_min, y_min, x_max, y_max, width, height)
+
+    # prepare the data for rasterization
+    points_vx = [(Point(coord), value) for coord, value in zip(zip(points_to[:,0][mask], points_to[:,1][mask]), dx[mask])]
+    points_vy = [(Point(coord), value) for coord, value in zip(zip(points_to[:,0][mask], points_to[:,1][mask]), dy[mask])]
+
+    # rasterize the data
+    vx_arr = rasterize(points_vx, out_shape=(height, width), transform=transform, dtype='float32')
+    vy_arr = rasterize(points_vy, out_shape=(height, width), transform=transform, dtype='float32')
+    vv_arr = np.sqrt(vx_arr**2 + vy_arr**2)
+
+    with rasterio.open(output_vx_fp, 'w', driver='GTiff', height=height, width=width, count=1, dtype='float32', 
+                       crs=proj_to, transform=transform) as dst:
+        dst.write(vx_arr, 1)
+    with rasterio.open(output_vy_fp, 'w', driver='GTiff', height=height, width=width, count=1, dtype='float32', 
+                       crs=proj_to, transform=transform) as dst:
+        dst.write(vy_arr, 1)
+
+    # ------------------- plotting ----------------------
+    if plot_changes:
+        quiv_scale = kwargs.get('quiv_scale', 200)
+        quiv_width = kwargs.get('quiv_width', 0.005)
+        quiv_color= kwargs.get('quiv_color', 'autumn')
+    
+        title = kwargs.get('title', None)
+        ctitle = kwargs.get('ctitle', None)
+        base_arr_color = kwargs.get('base_arr_color', 'BrBG')
+        base_arr_vmin = kwargs.get('base_arr_vmin', 0)
+        base_arr_vcenter = kwargs.get('base_arr_vcenter', 10)
+        base_arr_vmax = kwargs.get('base_arr_vmax', 50)
+    
+        # original plot
+        rasterLike(vv_data, 'tmp_vv_plt.tif', vx_fp)
+        quiv_plot(points_from[:,0], points_from[:,1], vx_data, vy_data, 1, quiv_scale, quiv_width=quiv_width, quiv_color=quiv_color,
+                  base_tiff='tmp_vv_plt.tif', title=title, ctitle=ctitle, base_arr_color=base_arr_color,  
+                  base_arr_vmin=base_arr_vmin, base_arr_vcenter=base_arr_vcenter, base_arr_vmax=base_arr_vmax)
+
+        # reprojected plot
+        rasterLike(vv_arr, 'tmp_vv_plt.tif', output_vx_fp)
+        quiv_plot(points_to[:,0][mask], points_to[:,1][mask], dx[mask], dy[mask], 1, quiv_scale, quiv_width=quiv_width, 
+                  quiv_color=quiv_color, base_tiff='tmp_vv_plt.tif', title=title, ctitle=ctitle, base_arr_color=base_arr_color,  
+                  base_arr_vmin=base_arr_vmin, base_arr_vcenter=base_arr_vcenter, base_arr_vmax=base_arr_vmax)
+
+    # ---------------- 5. apply correction based on straight reprojection magnitude ----------------
+    if apply_correction:
+        assert np.abs(pixel_size_x-pixel_size_y) < 0.1, f'Pixels are not square: ({pixel_size_x:.2f}, {pixel_size_y:.2f})'
+        # straight reprojection of velocity data
+        tifReprojectionResample(vx_fp, 'temp_vx.tif', epsg_to, pixel_size_x, Resampling.cubic_spline) # reproject
+        tifReprojectionResample(vy_fp, 'temp_vy.tif', epsg_to, pixel_size_x, Resampling.cubic_spline)
+        vx_arr_tmp = rasterio.open('temp_vx.tif').read(1)
+        vy_arr_tmp = rasterio.open('temp_vy.tif').read(1)
+        vx_arr_tmp[(np.abs(vx_arr_tmp) >= 1e10) | np.isnan(vx_arr_tmp)] = 0
+        vy_arr_tmp[(np.abs(vy_arr_tmp) >= 1e10) | np.isnan(vy_arr_tmp)] = 0
+        vv_dir_arr = (vx_arr_tmp**2 + vy_arr_tmp**2)**0.5 # derive velocity magnitude 
+
+        # adjust point-to-point velocity based on magnitude
+        mask_mag = (vv_dir_arr != 0) & (vv_arr != 0)
+        vx_arr_corr = np.copy(vx_arr)
+        vy_arr_corr = np.copy(vx_arr)
+        vx_arr_corr[mask_mag] = vx_arr[mask_mag] * vv_dir_arr[mask_mag] / vv_arr[mask_mag]
+        vy_arr_corr[mask_mag] = vy_arr[mask_mag] * vv_dir_arr[mask_mag] / vv_arr[mask_mag]
+        rasterLike(vx_arr_corr, output_vx_fp, 'temp_vx.tif')
+        rasterLike(vy_arr_corr, output_vy_fp, 'temp_vy.tif')
+        os.remove('temp_vx.tif')
+        os.remove('temp_vy.tif')
+        
+    # ------------------- plotting ----------------------
+    if plot_changes:
+        # reprojected plot, with correction
+        if apply_correction:
+            vv_arr_corr = np.sqrt(vx_arr_corr**2 + vy_arr_corr**2)
+            rasterLike(vv_arr_corr, 'tmp_vv_plt.tif', output_vx_fp)
+            quiv_plot(points_to[:,0][mask], points_to[:,1][mask], dx[mask], dy[mask], 1, quiv_scale, quiv_width=quiv_width, 
+                      quiv_color=quiv_color, base_tiff='tmp_vv_plt.tif', title=title, ctitle=ctitle, base_arr_color=base_arr_color,
+                      base_arr_vmin=base_arr_vmin, base_arr_vcenter=base_arr_vcenter, base_arr_vmax=base_arr_vmax)
+        
+        os.remove('tmp_vv_plt.tif')
+
+
+def quiv_plot(q1, q2, q3, q4, q5, q6, base_tiff=None, **kwargs):
+    """
+    Plots a velocity field with arrows and an optional background array.
+    
+    Parameters:
+        q1, q2, q3, q4: Coordinates and components for quiver plot.
+        q5: Magnitude of arrows for quiver.
+        q6: Scale factor for quiver arrows.
+        base_tiff: Geotiff for the background plot (optional).
+        **kwargs: Additional parameters for base array customization:
+            - `quiv_width`: Quiver arrow width
+            - `quiv_color`: Quiver arrow color
+            - `title`: Plot title
+            - `ctitle`: Colorbar title
+            - `base_arr_color`: Colormap for the base array (default is 'RdBu').
+            - `base_arr_ext`: Extent of the base array (default is None).
+            - `base_arr_vmin`, `base_arr_vcenter`, `base_arr_vmax`: Min, center, and max for colorbar (default is -50, 0, 50)
+    """    
+    fig = plt.figure()
+    ax = fig.add_subplot(111)  
+    
+    quiv_width = kwargs.get('quiv_width', 0.005)
+    quiv_color= kwargs.get('quiv_color', 'autumn')
+    ax.quiver(q1, q2, q3, q4, q5, cmap=quiv_color, scale=q6, width=quiv_width)
+
+    title = kwargs.get('title', None)
+    ctitle = kwargs.get('ctitle', None)
+    base_arr_color = kwargs.get('base_arr_color', 'RdBu')
+    base_arr_vmin = kwargs.get('base_arr_vmin', 0)
+    base_arr_vcenter = kwargs.get('base_arr_vcenter', 10)
+    base_arr_vmax = kwargs.get('base_arr_vmax', 50)
+    if base_tiff is not None:
+        divnorm = TwoSlopeNorm(vmin=base_arr_vmin, vcenter=base_arr_vcenter, vmax=base_arr_vmax)
+        base_ext = [rasterio.open(base_tiff).bounds[0], rasterio.open(base_tiff).bounds[2], 
+                    rasterio.open(base_tiff).bounds[1], rasterio.open(base_tiff).bounds[3]]
+        im = ax.imshow(rasterio.open(base_tiff).read(1), cmap=mpl.colormaps[base_arr_color], norm=divnorm, extent=base_ext)
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes('right', size='5%', pad=0.05)
+        fig.colorbar(im, cax=cax, label=ctitle)
+    
+    ax.set_title(title, weight='bold', pad=10)
+    fig.tight_layout(pad=3, w_pad=-3.0, h_pad=2.0)
+    plt.show()
 
