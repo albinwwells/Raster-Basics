@@ -502,7 +502,7 @@ def distance_to_shp(geotiff, gpd_shapefile, common_crs='EPSG:32606'):
     return distances_array
 
 
-def reproject_velocity(vx_fp, vy_fp, from_epsg, to_epsg, output_vx_fp, output_vy_fp, apply_correction=False, plot_changes=False, **kwargs):
+def reproject_velocity(vx_fp, vy_fp, from_epsg, to_epsg, output_vx_fp, output_vy_fp, nan_val=np.nan, apply_correction=False, plot_changes=False, **kwargs):
     '''
     Reproject velocity:
         1. Extract velocity data from geotiff
@@ -516,6 +516,7 @@ def reproject_velocity(vx_fp, vy_fp, from_epsg, to_epsg, output_vx_fp, output_vy
         vx_fp, vy_fp: Input velocity vectors
         from_epsg, to_epsg: Initial and target coordinate systems in EPSG number (e.g., 32606)
         output_vx_fp, output_vy_fp: Output filepaths
+        nan_val: data NaN value to remove (default: np.nan. NOTE: absolute values greater than 1e30 are automatically removed from data)
         apply_correction: whether to apply a correction that matches velocity magnitude with the direct reprojection (default: False)
         plot_changes: show plot of reprojection (default: False)
         **kwargs: Optional arguments passed along for plotting (quiv_scale, quiv_width, title, ctitle, base_arr_color, vmin, vcenter, vmax) 
@@ -536,8 +537,14 @@ def reproject_velocity(vx_fp, vy_fp, from_epsg, to_epsg, output_vx_fp, output_vy
     points_from = np.column_stack((np.array(lon).flatten(), np.array(lat).flatten()))
 
     # calculate the velocity endpoints
-    vx_data[np.abs(vx_data) > 1e30] = 0 # remove NaN values
+    vx_data[np.abs(vx_data) > 1e30] = 0 # remove unrealistic values
     vy_data[np.abs(vy_data) > 1e30] = 0
+    if np.isnan(nan_val): # remove NaN values
+        vx_data[np.isnan(vx_data)] = 0
+        vy_data[np.isnan(vy_data)] = 0
+    else:
+        vx_data[vx_data == nan_val] = 0
+        vy_data[vy_data == nan_val] = 0
     vv_data = (vx_data**2 + vy_data**2)**0.5
     endpoints_from = np.column_stack((points_from[:,0] + vx_data.flatten(), points_from[:,1] + vy_data.flatten()))
 

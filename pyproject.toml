@@ -1,6 +1,6 @@
 [project]
 name = "raster_basics"
-version = "1.5.9"
+version = "1.5.10"
 description = "Basic GeoTIFF Processing"
 requires-python = ">=3.6"
 authors = [
