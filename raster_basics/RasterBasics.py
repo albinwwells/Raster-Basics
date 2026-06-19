@@ -570,7 +570,7 @@ def reproject_velocity(vx_fp, vy_fp, from_epsg, to_epsg, output_vx_fp, output_vy
     # raster dimensions
     # width = int((x_max - x_min) / pixel_size_x) + 1 # incompatible for degree to meters conversion
     # height = int((y_max - y_min) / pixel_size_y) + 1 # incompatible for degree to meters conversion
-	height, width = vx_data.shape
+    height, width = vx_data.shape
 
     # define affine transform
     transform = from_bounds(x_min, y_min, x_max, y_max, width, height)
